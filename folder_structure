@@ -1,0 +1,77 @@
+smartcity/
+|---README.md
+|---environments/
+│   |---dev/
+│   │   |--- main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---staging/
+│   │   |--- main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---prod/
+│       |--- main.tf
+│       |---variables.tf
+│       |---outputs.tf
+|       |---README.md
+|       
+|---modules/
+│   |--- vpc/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md 
+|   |
+│   |---security-groups/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---eks/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---rds/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---s3/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---sqs/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---monitoring/
+│       |---main.tf
+│       |---variables.tf
+│       |---outputs.tf
+|       |---README.md
+|
+|---global/
+│   |---iam/
+│   │   |---main.tf
+│   │   |---variables.tf
+│   │   |---outputs.tf
+|   |   |---README.md
+|   |
+│   |---backend/
+│       |---main.tf
+|       |---outputs.tf
+|       |---variables.tf
+|
+|---modules.tf (optional root module, but better to use environments)

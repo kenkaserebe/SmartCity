@@ -1,3 +1,6 @@
+# Local sensitive files
+token
+
 # Local .terraform directories
 .terraform/
 
