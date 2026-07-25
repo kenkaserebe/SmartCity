@@ -1,0 +1,1 @@
+Let's use a root module that references the S3 backend that has been created. So the script creates the S3 backend and then moves to the root module to create the rest. The 120s should give the bucket time for creation. For now let's leave the "prompt to continue" in the script.
