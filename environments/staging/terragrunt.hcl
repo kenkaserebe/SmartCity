@@ -1,7 +1,14 @@
 # SmartCity/environment/staging/terragrunt.hcl
+# Staging environment
+# =============================================================================
+
 
 include "root" {
     path = find_in_parent_folders("terragrunt.hcl")
+}
+
+terraform {
+    source = "../../modules/vpc"
 }
 
 remote_state {
@@ -17,10 +24,31 @@ remote_state {
 
 # staging-specific overrides
 inputs = {
-    environment                 = "staging"
+    environment                 = "dev"
+
+    # Network
     vpc_cidr                    = "10.0.0.0/16"
+    public_subnet_cidrs         = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+    private_subnet_cidrs        = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
+    database_subnet_cidrs       = ["10.0.7.0/24", "10.0.8.0/24", "10.0.9.0/24"]
+    availability_zones          = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+
+    # Compute
     instance_type               = "t3.medium"
-    min_size                    = 2
-    max_size                    = 5
-    enable_deletion_protection  = false  # Set true if necessary
+
+    # Scaling
+    min_size                    = 1
+    max_size                    = 3
+    desired_size                = 1
+
+    # Features
+    enable_nat_gateway          = true
+    enable_flow_logs            = true
+    enable_deletion_protection  = false
+
+    # Common tags merged with environment
+    common_tags = {
+        Environment = "staging"
+        CostCenter  = "staging"
+    }
 }

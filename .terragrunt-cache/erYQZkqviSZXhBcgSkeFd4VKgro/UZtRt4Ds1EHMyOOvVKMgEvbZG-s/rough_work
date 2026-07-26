@@ -13,5 +13,7 @@ Flow logs bucket permissions: The bucket policy isn't included. You'll need to a
 
 Next Steps
 Test this module locally with terragrunt plan from your dev environment.
+
 Add the variables.tf and outputs.tf files (I'll write these next).
+
 Add the security groups module (after VPC is stable).

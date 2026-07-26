@@ -14,6 +14,7 @@ inputs = {
 locals {
     common_tags = {
         Project     = "SmartCity"
-        ManagedBy    = "Terragrunt"
+        ManageBy    = "Terragrunt"
+        Environment = get_env("ENVIRONMENT", "dev")
     }
 }
