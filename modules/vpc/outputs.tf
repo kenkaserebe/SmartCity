@@ -104,3 +104,63 @@ output "availability_zones" {
   description = "List of availability zones used"
   value = var.availability_zones
 }
+
+
+# ===========================================================================================
+# FLOW LOG OUTPUTS
+# ===========================================================================================
+output "flow_log_id" {
+  description = "ID of the VPC flow log (if enabled)"
+  value = try(aws_flow_log.vpc_flow_log[0].id, null)
+}
+
+output "flow_log_bucket_arn" {
+  description = "ARN of the flow log S3 bucket (if enabled)"
+  value = try(aws_s3_bucket.flow_logs[0].arn, null)
+}
+
+
+# ============================================================================================
+# SUMMARY OUTPUTS (Useful for debugging and monitoring)
+# ============================================================================================
+output "vpc_summary" {
+  description = "Summary of the VPC configuration"
+  value = {
+    vpc_id = aws_vpc.main.id
+    vpc_cidr = aws_vpc.main.cidr_block
+    environment = var.environment
+    region = var.region
+    public_subnets = length(aws_subnet.public)
+    private_subnets = length(aws_subnet.private)
+    database_subnets = length(aws_subnet.database)
+    nat_gateways = length(aws_nat_gateway.main)
+    flow_logs_enabled = var.enable_flow_logs
+  }
+}
+
+
+# =============================================================================================
+# DATABASE SUBNET GROUP (Convenience output for RDS)
+# =============================================================================================
+output "database_subnet_group_name" {
+  description = "Name of the databes subnet group (use this for RDS/Aurora)"
+  value = "${var.project_name}-${var.environment}-db-subnet-group"
+}
+
+
+# =============================================================================================
+# SECURITY GROUP REFERENCE OUTPUTS
+# =============================================================================================
+output "vpc_default_security_group_id" {
+  description = "ID of the default security group in the VPC (use with caution)"
+  value = aws_vpc.main.default_security_group_id
+}
+
+
+# =============================================================================================
+# VPC PEERING OUTPUTS (For future expansion)
+# =============================================================================================
+output "vpc_owner_id" {
+  description = "AWS account ID that owns the VPC"
+  value = data.aws_caller_identity.current.account_id
+}
