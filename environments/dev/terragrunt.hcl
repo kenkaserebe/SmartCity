@@ -3,17 +3,17 @@
 # =============================================================================
 
 include "root" {
-    path = find_in_parent_folders("terragrunt.hcl")
+    path = find_in_parent_folders("root.hcl")
 }
 
 terraform {
-    source = "../../modules/vpc"
+    source = "../../modules/vpc/"
 }
 
 remote_state {
     backend = "s3"
     config = {
-        bucket          = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID")}"
+        bucket          = "smart-city-tfstate-july"
         key             = "smartcity/dev/terraform.tfstate"
         region          = "eu-west-2"
         encrypt         = true 
@@ -45,6 +45,7 @@ inputs = {
     enable_nat_gateway          = true
     enable_flow_logs            = true
     enable_deletion_protection  = false
+    flow_logs_retention_days    = 7
 
     # Common tags merged with environment
     common_tags = {

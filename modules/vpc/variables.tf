@@ -111,7 +111,7 @@ variable "region" {
 
 variable "common_tags" {
   description   = "Common tags applied to all resources (merged with resource-specific tags)"
-  type          = string
+  type          = map(string)
   default       = {}
 }
 

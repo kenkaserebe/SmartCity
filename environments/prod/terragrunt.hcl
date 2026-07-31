@@ -7,7 +7,7 @@ include "root" {
 }
 
 terraform {
-    source = "../../modules/vpc"
+    source = "../../modules/vpc/"
     # For production, you'd likely use a Git URL:
     # source = "git@github.com:your-org/terraform-modules.git//modules/vpc?ref=v1.0.0"
 }

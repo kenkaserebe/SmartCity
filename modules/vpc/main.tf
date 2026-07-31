@@ -1,5 +1,9 @@
 # SmartCity/modules/vpc/main.tf
 
+terraform {
+  backend "s3" {}
+}
+
 # ======================================================================
 # VPC
 # ======================================================================
@@ -174,14 +178,15 @@ resource "aws_nat_gateway" "main" {
 # exits through the NAT gateway in AZ-A's public subnet
 # ==================================================================================
 resource "aws_route_table" "private" {
-  count     = var.enable_nat_gateway ? length(var.private_subnet_cidrs) : 0
+  count     = length(aws_subnet.private)
 
   vpc_id    = aws_vpc.main.id
 
-  route = {
-    cidr_block      = "0.0.0.0/0"
-    nat_gateway_id  = aws_nat_gateway.main[count.index % length(aws_nat_gateway.main)].id
-  }
+  # route {
+  #   cidr_block      = "0.0.0.0/0"
+  #   nat_gateway_id  = aws_nat_gateway.main[count.index].id
+  # }
+  
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-private-rt-${count.index + 1}"
@@ -191,6 +196,12 @@ resource "aws_route_table" "private" {
   })
 }
 
+resource "aws_route" "private_nat" {
+  count                   = length(aws_route_table.private)
+  route_table_id          = aws_route_table.private[count.index].id
+  destination_cidr_block  = "0.0.0.0/0"
+  nat_gateway_id          = aws_nat_gateway.main[count.index].id
+}
 
 # ======================================================================================
 # PRIVATE ROUTE TABLE ASSOCIATIONS
@@ -281,13 +292,13 @@ resource "aws_s3_bucket_public_access_block" "flow_logs" {
 
 
 resource "aws_s3_bucket_lifecycle_configuration" "flow_logs" {
-  count = var.enable_flow_logs ? 1 : 0
+  count   = var.enable_flow_logs ? 1 : 0
 
-  bucket = aws_s3_bucket.flow_logs[0].id
+  bucket  = aws_s3_bucket.flow_logs[0].id
 
   rule {
-    id = "expire-old-logs"
-    status = "Enabled"
+    id      = "expire-old-logs"
+    status  = "Enabled"
 
     expiration {
       days = var.flow_logs_retention_days

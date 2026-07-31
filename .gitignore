@@ -1,5 +1,6 @@
 # Local sensitive files
 token
+rough_work
 
 # Local .terraform directories
 .terraform/

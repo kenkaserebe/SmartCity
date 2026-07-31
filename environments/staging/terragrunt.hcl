@@ -8,7 +8,7 @@ include "root" {
 }
 
 terraform {
-    source = "../../modules/vpc"
+    source = "../../modules/vpc/"
 }
 
 remote_state {
