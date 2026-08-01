@@ -4,6 +4,10 @@ roughwork
 
 # Local .terraform directories
 .terraform/
+.terragrunt-cache
+
+# Local .terraform files
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
