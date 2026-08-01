@@ -30,32 +30,32 @@ output "vpc_arn" {
 # ==================================================================================
 output "public_subnet_ids" {
   description   = "IDs of public subnets"
-  value         = [for subnet in aws_subnet.public: subnet.id]
+  value         = aws_subnet.public[*].id
 }
 
 output "public_subnet_cidrs" {
   description   = "CIDR blocks of public subnets"
-  value         = [for subnet in aws_subnet.public : subnet.cidr_block]
+  value         = aws_subnet.public[*].cidr_block
 }
 
 output "private_subnet_ids" {
   description   = "IDs of private subnets"
-  value         = [for subnet in aws_subnet.private : subnet.id]
+  value         = aws_subnet.private[*].id
 }
 
 output "private_subnet_cidrs" {
   description   = "CIDR blocks of private subnets"
-  value         = [for subnet in aws_subnet.private : subnet.cidr_block]
+  value         = aws_subnet.private[*].cidr_block
 }
 
 output "database_subnet_ids" {
   description   = "IDs of database subnets"
-  value         = [for subnet in aws_subnet.database : subnet.id]
+  value         = aws_subnet.database[*].id
 }
 
 output "database_subnet_cidrs" {
   description   = "CIDR blocks of database subnets"
-  value         = [for subnet in aws_subnet.database : subnet.cidr_block]
+  value         = aws_subnet.database[*].cidr_block
 }
 
 
@@ -69,12 +69,12 @@ output "public_route_table_id" {
 
 output "private_route_table_id" {
   description   = "IDs of the private route tables"
-  value         = [for rt in aws_route_table.private : rt.id]
+  value         = aws_route_table.private[*].id
 }
 
 output "database_route_table_id" {
   description   = "IDs of the database route tables"
-  value         = [for rt in aws_route_table.database : rt.id]
+  value         = aws_route_table.database[*].id
 }
 
 
@@ -88,12 +88,12 @@ output "internet_gateway_id" {
 
 output "nat_gateway_ids" {
   description   = "IDs of NAT gateways"
-  value         = [for nat in aws_nat_gateway.main: nat.id]
+  value         = aws_nat_gateway.main[*].id
 }
 
 output "nat_gateway_public_ips" {
   description   = "Public IP addresses of NAT gateways"
-  value         = [for eip in aws_eip.nat : eip.public_ip]
+  value         = aws_eip.nat[*].public_ip
 }
 
 
