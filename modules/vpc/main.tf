@@ -410,7 +410,7 @@ resource "aws_s3_bucket_policy" "flow-logs" {
 #   log_format            = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
 
 #   tags = merge(var.common_tags, {
-#     Name = "${var.project_name}-$(var.environment)-flow-logs"
+#cod     Name = "${var.project_name}-$(var.environment)-flow-logs"
 #   })
 # }
 
