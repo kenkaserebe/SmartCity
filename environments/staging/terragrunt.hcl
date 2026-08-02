@@ -11,17 +11,6 @@ terraform {
     source = "../../modules/vpc/"
 }
 
-remote_state {
-    backend = "s3"
-    config = {
-        bucket          = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID")}"
-        key             = "smartcity/staging/terraform.tfstate"
-        region          = "eu-west-2"
-        encrypt         = true 
-        use_lockfile    = true
-    }
-}
-
 # staging-specific overrides
 inputs = {
     environment                 = "dev"

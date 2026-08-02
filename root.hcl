@@ -17,3 +17,14 @@ locals {
         ManagedBy    = "Terragrunt"
     }
 }
+
+remote_state {
+    backend = "s3"
+    config = {
+        bucket          = "smart-city-tfstate-july"
+        key             = "smartcity/dev/terraform.tfstate"
+        region          = "eu-west-2"
+        encrypt         = true 
+        use_lockfile    = true
+    }
+}

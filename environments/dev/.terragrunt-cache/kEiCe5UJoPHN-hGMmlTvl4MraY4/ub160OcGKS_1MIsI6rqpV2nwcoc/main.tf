@@ -6,7 +6,7 @@ terraform {
 
 locals {
   az_map = {
-    for idx, az in var.var.availability_zones : az => {
+    for idx, az in var.availability_zones : az => {
       public_cidr   = var.public_subnet_cidrs[idx]
       private_cidr  = var.private_subnet_cidrs[idx]
       database_cidr = var.database_subnet_cidrs[idx]
@@ -137,7 +137,7 @@ resource "aws_route" "public_internet" {
 # PUBLIC ROUTE TABLE ASSOCIATIONS
 # ==================================================================================
 resource "aws_route_table_association" "public" {
-  count             = length(var.public_subnet_cidrs)
+  for_each          = local.az_map
   subnet_id         = aws_subnet.public[each.key].id
   route_table_id    = aws_route_table.public.id
 }
@@ -166,14 +166,14 @@ resource "aws_nat_gateway" "main" {
   for_each = var.enable_nat_gateway ? local.az_map : {}
 
   allocation_id = aws_eip.nat[each.key].id
-  subnet_id     = aws_eip.nat[each.key].id
+  subnet_id     = aws_subnet.public[each.key].id
 
   # Ensure NAT gateway is created after Internet Gateway
   # (Internet Gateway is required for NAT gateway to route traffic)
   depends_on = [ aws_internet_gateway.main ]
 
   tags = merge(var.common_tags, {
-    Name        = "${var.project_name}-${var.environment}-nat-{each.key}"
+    Name        = "${var.project_name}-${var.environment}-nat-${each.key}"
     Environment = var.environment
     Component   = "networking"
   })
@@ -230,7 +230,7 @@ resource "aws_route_table" "database" {
   vpc_id    = aws_vpc.main.id
 
   tags = merge(var.common_tags, {
-    Name        = "${var.project_name}-${var.environment}-database-rt-${count.index + 1}"
+    Name        = "${var.project_name}-${var.environment}-database-rt-${each.key}"
     Environment = var.environment
     Component   = "networking"
     Tier        = "database"
@@ -267,7 +267,7 @@ resource "aws_flow_log" "vpc_flow_log" {
 resource "aws_s3_bucket" "flow_logs" {
   count         = var.enable_flow_logs ? 1 : 0
 
-  bucket        = "${var.project_name}-${var.environment}-vpc-flow-logs-${data.aws_caller_identity.current.account_id}"
+  bucket        = "${var.project_name}-${var.environment}-vpc-flow-logs"
   force_destroy = true
 
   tags = merge(var.common_tags, {
@@ -290,6 +290,19 @@ resource "aws_s3_bucket_public_access_block" "flow_logs" {
 }
 
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "flow_logs" {
+  count = var.enable_flow_logs ? 1 : 0
+
+  bucket = aws_s3_bucket.flow_logs[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+
 resource "aws_s3_bucket_lifecycle_configuration" "flow_logs" {
   count   = var.enable_flow_logs ? 1 : 0
 
@@ -305,6 +318,101 @@ resource "aws_s3_bucket_lifecycle_configuration" "flow_logs" {
   }
 }
 
+
+# ============================================================================================
+# TRUST POLICY
+# ============================================================================================
+data "aws_iam_policy_document" "flow_logs_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "flow_logs" {
+  name                = "${var.project_name}-${var.environment}-vpc-flow-logs-role"
+  assume_role_policy  = data.aws_iam_policy_document.flow_logs_assume_role.json
+}
+
+
+data "aws_iam_policy_document" "flow_logs_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.flow_logs[0].arn}/*"
+    ]
+  }
+}
+
+# Attach policy
+resource "aws_iam_role_policy" "flow_logs" {
+  count = var.enable_flow_logs ? 1 : 0
+
+  name = "flow-logs-policy"
+  role = aws_iam_role.flow_logs.id
+  policy = data.aws_iam_policy_document.flow_logs_policy.json
+}
+
+
+data "aws_iam_policy_document" "flow_logs_bucket_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
+    }
+
+    actions = ["s3:PutObject"]
+
+    resources = [
+      "${aws_s3_bucket.flow_logs[0].arn}/*"
+    ]
+
+    condition {
+      test = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_policy" "flow-logs" {
+  count = var.enable_flow_logs ? 1 : 0
+
+  bucket = aws_s3_bucket.flow_logs[0].id
+  policy = data.aws_iam_policy_document.flow_logs_bucket_policy.json
+}
+
+
+# # VPC Flow Log
+# resource "aws_flow_log" "vpc_flow_log" {
+#   count = var.enable_flow_logs ? 1 : 0
+
+#   log_destination       = aws_s3_bucket.flow_logs[0].arn
+#   log_destination_type  = "s3"
+
+#   traffic_type          = "ALL"
+#   vpc_id                = aws_vpc.main.id
+#   iam_role_arn          = aws_iam_role.flow_logs[0].arn
+#   log_format            = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status}"
+
+#   tags = merge(var.common_tags, {
+#cod     Name = "${var.project_name}-$(var.environment)-flow-logs"
+#   })
+# }
 
 # ============================================================================================
 # DATA SOURCES

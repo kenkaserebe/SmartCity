@@ -12,17 +12,6 @@ terraform {
     # source = "git@github.com:your-org/terraform-modules.git//modules/vpc?ref=v1.0.0"
 }
 
-remote_state {
-    backend = "s3"
-    config = {
-        bucket          = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID")}"
-        key             = "smartcity/prod/terraform.tfstate"
-        region          = "eu-west-2"
-        encrypt         = true 
-        use_lockfile    = true
-    }
-}
-
 # prod-specific overrides
 inputs = {
     environment                 = "prod"
