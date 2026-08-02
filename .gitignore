@@ -4,7 +4,7 @@ roughwork
 
 # Local .terraform directories
 .terraform/
-.terragrunt-cache
+.terragrunt-cache/
 
 # Local .terraform files
 # .terraform.lock.hcl
