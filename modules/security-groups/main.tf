@@ -352,3 +352,130 @@ resource "aws_security_group" "eks_cluster" {
 # ==============================================================================
 # For worker nodes in the EKS cluster
 # ==============================================================================
+resource "aws_security_group" "eks_node" {
+  name        = "${var.project_name}-${var.environment}-eks-node-sg"
+  description = "EKS node security group"
+  vpc_id      = var.vpc_id
+
+  # Ingress: Node-to-node communication
+  ingress {
+    description = "Node to node communication"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
+  # Ingress: SSH from bastion (if needed)
+  dynamic "ingress" {
+    for_each = var.enable_bastion_ssh ? [1] : []
+    content {
+      description     = "SSH from bastion"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      security_groups = [aws_security_group.bastion.id]
+    }
+  }
+
+  # Ingress: NodePort services from load balancer
+  ingress {
+    description     = "NodePort services from load balancer"
+    from_port       = 30000
+    to_port         = 32767
+    protocol        = "tcp"
+    security_groups = [aws_security_group.load_balancer.id]
+  }
+
+  # Ingress: Node metrics from monitoring
+  dynamic "ingress" {
+    for_each = var.enable_monitoring ? [1] : []
+    content {
+      description = "Prometheus metrics scraping"
+      from_port   = 9100
+      to_port     = 9100
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cidr]
+    }
+  }
+
+  # Egress: Nodes need full internet access for pulling images, updates, etc.
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.common_tags, {
+    Name        = "${var.project_name}-${var.environment}-eks-node-sg"
+    Environment = var.environment
+    Component   = "kubernetes"
+    Service     = "worker-node"
+  })
+}
+
+# =================================================================================
+# 8. MONITORING SECURITY GROUP
+# =================================================================================
+# For Prometheus, Grafana, and other monitoring tools
+# =================================================================================
+resource "aws_security_group" "monitoring" {
+  count       = var.enable_monitoring ? 1 : 0
+
+  name        = "${var.project_name}-${var.environment}-monitoring-sg"
+  description = "Monitoring security group"
+  vpc_id      = var.vpc_id
+
+  # Ingress: Grafana web UI from load balancer
+  ingress {
+    description     = "Grafana from load balancer"
+    from_port       = var.grafana_port
+    to_port         = var.grafana_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.load_balancer.id]
+  }
+
+  # Ingress: Prometheus metrics from nodes
+  ingress {
+    description     = "Prometheus metrics from nodes"
+    from_port       = var.prometheus_port
+    to_port         = var.prometheus_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.eks_node.id]
+  }
+
+  # Ingress: Prometheus metrics from application
+  ingress {
+    description     = "Prometheus metrics from application"
+    from_port       = var.prometheus_port
+    to_port         = var.prometheus_port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.application.id]
+  }
+
+  # Ingress: Alertmanager webhook from application
+  ingress {
+    description     = "Alertmanager from application"
+    from_port       = 9093
+    to_port         = 9093
+    protocol        = "tcp"
+    security_groups = [aws_security_group.application.id]
+  }
+
+  # Egress: Allow outbound
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.common_tags, {
+    Name        = "${var.project_name}-${var.environment}-monitoring-sg"
+    Environment = var.environment
+    Component   = "monitoring"
+  })
+}
