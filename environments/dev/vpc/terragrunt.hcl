@@ -1,5 +1,4 @@
-# SmartCity/environment/dev/terragrunt.hcl
-# Development environment
+# SmartCity/environment/dev/vpc/terragrunt.hcl
 # =============================================================================
 
 include "root" {
@@ -7,7 +6,7 @@ include "root" {
 }
 
 terraform {
-    source = "../../modules/vpc/"
+    source = "../../../modules/vpc/"
 }
 
 

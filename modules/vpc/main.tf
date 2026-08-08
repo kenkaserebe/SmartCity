@@ -4,16 +4,6 @@ terraform {
   backend "s3" {}
 }
 
-locals {
-  az_map = {
-    for idx, az in var.availability_zones : az => {
-      public_cidr   = var.public_subnet_cidrs[idx]
-      private_cidr  = var.private_subnet_cidrs[idx]
-      database_cidr = var.database_subnet_cidrs[idx]
-    }
-  }
-}
-
 # ======================================================================
 # VPC
 # ======================================================================
@@ -21,7 +11,7 @@ resource "aws_vpc" "main" {
   cidr_block            = var.vpc_cidr
   enable_dns_support    = var.enable_dns_support
   enable_dns_hostnames  = var.enable_dns_hostname
-  instance_tenancy      = "default"
+  instance_tenancy      = var.instance_tenancy
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-vpc"
@@ -49,7 +39,7 @@ resource "aws_internet_gateway" "main" {
 # PUBLIC SUBNETS
 # ======================================================================
 resource "aws_subnet" "public" {
-  for_each          = local.az_map
+  for_each          = var.subnets
 
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value.public_cidr
@@ -72,7 +62,7 @@ resource "aws_subnet" "public" {
 # PRIVATE SUBNETS
 # =======================================================================
 resource "aws_subnet" "private" {
-  for_each          = local.az_map
+  for_each          = var.subnets
 
   vpc_id            = aws_vpc.main.id
   cidr_block        = each.value.private_cidr
@@ -93,7 +83,7 @@ resource "aws_subnet" "private" {
 # DATABASE SUBNETS
 # ==============================================================================
 resource "aws_subnet" "database" {
-  for_each                  = local.az_map
+  for_each                  = var.subnets
   vpc_id                    = aws_vpc.main.id
   cidr_block                = each.value.database_cidr
   availability_zone         = each.key
@@ -137,7 +127,7 @@ resource "aws_route" "public_internet" {
 # PUBLIC ROUTE TABLE ASSOCIATIONS
 # ==================================================================================
 resource "aws_route_table_association" "public" {
-  for_each          = local.az_map
+  for_each          = var.subnets
   subnet_id         = aws_subnet.public[each.key].id
   route_table_id    = aws_route_table.public.id
 }
@@ -147,7 +137,7 @@ resource "aws_route_table_association" "public" {
 # ELASTIC IP ADDRESSES FOR NAT GATEWAYS
 # ==================================================================================
 resource "aws_eip" "nat" {
-  for_each  = var.enable_nat_gateway ? local.az_map : {}
+  for_each  = var.enable_nat_gateway ? var.subnets : {}
 
   domain    = "vpc"
 
@@ -163,7 +153,7 @@ resource "aws_eip" "nat" {
 # NAT GATEWAYS
 # =================================================================================
 resource "aws_nat_gateway" "main" {
-  for_each = var.enable_nat_gateway ? local.az_map : {}
+  for_each = var.enable_nat_gateway ? var.subnets : {}
 
   allocation_id = aws_eip.nat[each.key].id
   subnet_id     = aws_subnet.public[each.key].id
@@ -188,7 +178,7 @@ resource "aws_nat_gateway" "main" {
 # exits through the NAT gateway in AZ-A's public subnet
 # ==================================================================================
 resource "aws_route_table" "private" {
-  for_each  = local.az_map
+  for_each  = var.subnets
 
   vpc_id    = aws_vpc.main.id  
 
@@ -201,7 +191,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route" "private_nat" {
-  for_each                = var.enable_nat_gateway ? local.az_map : {}
+  for_each                = var.enable_nat_gateway ? var.subnets : {}
   route_table_id          = aws_route_table.private[each.key].id
   destination_cidr_block  = "0.0.0.0/0"
   nat_gateway_id          = aws_nat_gateway.main[each.key].id
@@ -211,7 +201,7 @@ resource "aws_route" "private_nat" {
 # PRIVATE ROUTE TABLE ASSOCIATIONS
 # ======================================================================================
 resource "aws_route_table_association" "private" {
-  for_each          = local.az_map
+  for_each          = var.subnets
 
   subnet_id         = aws_subnet.private[each.key].id
   route_table_id    =  aws_route_table.private[each.key].id
@@ -225,7 +215,7 @@ resource "aws_route_table_association" "private" {
 # They get internet access via NAT gateway if enabled
 # =====================================================================================
 resource "aws_route_table" "database" {
-  for_each  = local.az_map
+  for_each  = var.subnets
 
   vpc_id    = aws_vpc.main.id
 
@@ -238,7 +228,7 @@ resource "aws_route_table" "database" {
 }
 
 resource "aws_route_table_association" "database" {
-  for_each          = local.az_map
+  for_each          = var.subnets
   subnet_id         = aws_subnet.database[each.key].id
   route_table_id    = aws_route_table.database[each.key].id
 }

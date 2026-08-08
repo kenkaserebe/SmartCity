@@ -29,70 +29,29 @@ variable "vpc_cidr" {
   }
 }
 
+variable "subnets" {
+  description = "Map of AZ => subnet CIDRs"
+  type = map(object({
+    public_cidr     = string
+    private_cidr    = string
+    database_cidr   = string
+  }))
 
-variable "public_subnet_cidrs" {
-  description   = "List of CIDR blocks for public subnets (must match availability_zones count)"
-  type          = list(string)
   validation {
-    condition       = length(var.public_subnet_cidrs) >= 2
-    error_message   = "At least 2 public subnets are required for high availability."
+    condition       = length(var.subnets) >= 2
+    error_message   = "At least 2 AZs (subnets) are required."
   }
+
   validation {
-    condition       = alltrue([for cidr in var.public_subnet_cidrs : can(cidrhost(cidr, 0))])
-    error_message   = "All public_subnet_cidrs must be valid CIDR blocks."
+    condition = alltrue([
+        for s in values(var.subnets) :
+        can(cidrhost(s.public_cidr, 0)) &&
+        can(cidrhost(s.private_cidr, 0)) &&
+        coan(cidrhost(s.database_cidr, 0))
+    ])
+    error_message = "All subnet CIDRs must be valid."
   }
 }
-
-
-variable "private_subnet_cidrs" {
-  description   = "List of CIDR blocks for private subnets (must match availability_zones count)"
-  type          = list(string)
-  validation {
-    condition       = length(var.private_subnet_cidrs) >= 2
-    error_message   = "At least 2 private subnets are required for high availability."
-  }
-  validation {
-    condition       = alltrue([for cidr in var.private_subnet_cidrs : can(cidrhost(cidr, 0))])
-    error_message   = "All private_subnet_cidrs must be valid CIDR blocks."
-  }
-}
-
-
-variable "database_subnet_cidrs" {
-  description   = "List of CIDR blocks for database subnets (must match availability_zones count)"
-  type          = list(string)
-  validation {
-    condition       = length(var.database_subnet_cidrs) >= 2
-    error_message   = "At least 2 database subnets are required for RDS/Aurora high availability."
-  }
-  validation {
-    condition       = alltrue([for cidr in var.database_subnet_cidrs : can(cidrhost(cidr, 0))])
-    error_message   = "All database_subnet_cidrs must be valid CIDR blocks."
-  }
-}
-
-
-variable "availability_zones" {
-  description   = "List of availability zones to use (must match subnet counts)"
-  type          = list(string)
-  validation {
-    condition       = length(var.availability_zones) >= 2
-    error_message   = "At least 2 availability zones are required for high availability."
-  }
-  validation {
-    condition       = length(var.availability_zones) == length(var.public_subnet_cidrs)
-    error_message   = "Number of availability zones must equal number of public subnets."
-  }
-  validation {
-    condition       = length(var.availability_zones) == length(var.private_subnet_cidrs)
-    error_message   = "Number of availability zones must equal number of private subnets."
-  }
-  validation {
-    condition       = length(var.availability_zones) == length(var.database_subnet_cidrs)
-    error_message   = "Number of availability zones must equal number of database subnets."
-  }
-}
-
 
 # ===========================================================================================================
 # OPTIONAL VARIABLES (WITH DEFAULTS)
@@ -150,7 +109,7 @@ variable "enable_deletion_protection" {
 variable "instance_tenancy" {
   description   = "Tenancy option for instances lauched in the VPC (default or dedicated)"
   type          = string
-  default       = "default"
+  default       = var.instacnce_tenancy
   validation {
     condition       = contains(["default", "dedicated"], var.instance_tenancy)
     error_message   = "instance_tenancy must be either 'default' or 'dedicated'."
