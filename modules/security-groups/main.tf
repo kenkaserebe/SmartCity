@@ -1,5 +1,9 @@
 # SmartCity/modules/security-groups/main.tf
 
+terraform {
+  backend "s3" {}
+}
+
 # =============================================================================
 # Security Groups Module - SmartCity IoT Platform
 # =============================================================================
@@ -70,7 +74,7 @@ resource "aws_security_group" "load_balancer" {
 
   # Ingress: HTTP from internet
   ingress {
-    description       = "HTTP from internet"
+    description       = "HTTP from internet && Health check from load balancer"
     from_port         = 80
     to_port           = 80
     protocol          = "tcp"
@@ -89,13 +93,13 @@ resource "aws_security_group" "load_balancer" {
   }
 
   # Ingress: Health checks from ALB
-  ingress {
-    description = "Health check from load balancer"
-    from_port   = var.load_balancer_health_check_port
-    to_port     = var.load_balancer_health_check_port
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # ingress {
+  #   description = "Health check from load balancer"
+  #   from_port   = var.load_balancer_health_check_port
+  #   to_port     = var.load_balancer_health_check_port
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   # Egress: Allow all outbound (load balancer needs to talk to targets)
   egress {

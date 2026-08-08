@@ -47,7 +47,7 @@ variable "subnets" {
         for s in values(var.subnets) :
         can(cidrhost(s.public_cidr, 0)) &&
         can(cidrhost(s.private_cidr, 0)) &&
-        coan(cidrhost(s.database_cidr, 0))
+        can(cidrhost(s.database_cidr, 0))
     ])
     error_message = "All subnet CIDRs must be valid."
   }
@@ -91,7 +91,7 @@ variable "flow_logs_retention_days" {
   type          = number
   default       = 30
   validation {
-    condition = var.flow_logs_retention_days >= 1 && var.flow_logs_retention_days <= 3650
+    condition     = var.flow_logs_retention_days >= 1 && var.flow_logs_retention_days <= 3650
     error_message = "flow_logs_retention_days must be between 1 and 3650 days."
   }
 }
@@ -107,9 +107,9 @@ variable "enable_deletion_protection" {
 # ADVANCED CONFIGURATION (Usually keep defaults)
 # ===========================================================================================================
 variable "instance_tenancy" {
-  description   = "Tenancy option for instances lauched in the VPC (default or dedicated)"
-  type          = string
-  default       = var.instacnce_tenancy
+  description       = "Tenancy option for instances lauched in the VPC (default or dedicated)"
+  type              = string
+  default           = "default"
   validation {
     condition       = contains(["default", "dedicated"], var.instance_tenancy)
     error_message   = "instance_tenancy must be either 'default' or 'dedicated'."

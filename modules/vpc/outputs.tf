@@ -93,7 +93,7 @@ output "private_route_tables" {
 output "database_route_tables" {
   description = "IDs of the database route tables"
   value = {
-    for az, rt in aws_route_tble.database : az => rt.id
+    for az, rt in aws_route_table.database : az => rt.id
   }
 }
 

@@ -27,7 +27,7 @@ inputs = {
     # From VPC
     vpc_id = dependency.vpc.outputs.vpc_id
     vpc_cidr = dependency.vpc.outputs.vpc_cidr
-    private_subnet_ids = dependency.vpc.outputs.private_subnet_ids
+    # private_subnet_ids = dependency.vpc.outputs.private_subnet_ids.id
 
     # Environment
     environment = "dev"

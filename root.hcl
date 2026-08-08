@@ -44,7 +44,7 @@ locals {
 remote_state {
     backend = "s3"
     config = {
-        bucket          = "smart-city-tfstate-july"
+        bucket          = "smart-city-tfstate-august"
         key             = "smartcity/${path_relative_to_include()}/terraform.tfstate"
         region          = "eu-west-2"
         encrypt         = true 
