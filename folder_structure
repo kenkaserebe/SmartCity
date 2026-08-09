@@ -1,9 +1,14 @@
 smartcity/
 |---README.md
+|---root.hcl
 |---environments/
 │   |---dev/
-│   │   |--- main.tf
-│   │   |---variables.tf
+│   │   |---vpc/
+|   |   |   |---terragrunt.hcl
+|   |   |
+│   │   |---security-groups/
+|   |   |   |---terragrunt.hcl
+|   |   |
 │   │   |---outputs.tf
 |   |   |---README.md
 |   |
@@ -31,6 +36,11 @@ smartcity/
 │   │   |---variables.tf
 │   │   |---outputs.tf
 |   |   |---README.md
+|   |
+|   |---iam/
+|   |   |---main.tf
+|   |   |---variables.tf
+|   |   |---outputs.tf
 |   |
 │   |---eks/
 │   │   |---main.tf
@@ -63,15 +73,7 @@ smartcity/
 |       |---README.md
 |
 |---global/
-│   |---iam/
-│   │   |---main.tf
-│   │   |---variables.tf
-│   │   |---outputs.tf
-|   |   |---README.md
-|   |
 │   |---backend/
 │       |---main.tf
 |       |---outputs.tf
 |       |---variables.tf
-|
-|---modules.tf (optional root module, but better to use environments)
