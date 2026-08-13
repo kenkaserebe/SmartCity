@@ -235,7 +235,7 @@ resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "vpc-cni"
   addon_version = var.vpc_cni_version
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-vpc-cni"
@@ -250,7 +250,7 @@ resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "coredns"
   addon_version = var.coredns_version
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-coredns"
@@ -265,7 +265,7 @@ resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "kube-proxy"
   addon_version = var.kube_proxy_version
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-kube-proxy"
@@ -282,7 +282,7 @@ resource "aws_eks_addon" "lb_controller" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "aws-load-balancer-controller"
   addon_version = var.lb_controller_version
-  resolve_conflicts = "OVERWRITE"
+  resolve_conflicts_on_create = "OVERWRITE"
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-lb-controller"
