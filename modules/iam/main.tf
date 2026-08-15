@@ -108,7 +108,7 @@ resource "aws_iam_role_policy_attachment" "ecr_pull_policy" {
 
 # S3 Policy - For nodes to access S3 buckets (optional)
 resource "aws_iam_role_policy_attachment" "s3_policy" {
-  count         = var.enable_s3_access ? 1 : 0
+  count         = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
   policy_arn    = aws_iam_policy.s3_access[0].arn
   role          = aws_iam_role.eks_node.name
@@ -197,27 +197,45 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 # ============================================================================================
 
 # 5a. S3 Access Role for Application
+
+data "aws_iam_policy_document" "app_s3_assume_role" {
+  count = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
+
+  statement {
+    effect = "Allow"
+
+    actions = [ "sts:AssumeRoleWithWebIdentity" ]
+
+    principals {
+      type = "Federated"
+
+      identifiers = [
+        aws_iam_openid_connect_provider.cluster[0].arn
+      ]
+    }
+    condition {
+      test = "StringEquals"
+
+      variable = "${replace(
+      data.aws_eks_cluster.cluster[0].identity[0].oidc[0].issuer, 
+      "https://",
+      ""
+      )}:sub"
+
+      values = [
+        "system:serviceaccount:${var.namespace}:s3-access"
+      ]
+    }
+  }
+}
+
 resource "aws_iam_role" "app_s3" {
-  count = var.enable_s3_access ? 1 : 0
+  count = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
   name = "${var.project_name}-${var.environment}-app-s3-role"
 
-  assume_role_policy = var.create_oidc_provider ? jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-        Effect = "Allow"
-        Principal = {
-            Federated = aws_iam_openid_connect_provider.cluster[0].arn
-        }
-        Action = "sts:AssumeRoleWithWebIdentity"
-        Condition = {
-            StringEquals = {
-                "${data.aws_eks_cluster.cluster[0].identity[0].oidc[0].issuer}:sub" = "system:serviceaccount:${var.namespace}:s3-access"
-            }
-        }
-    }]
-  }) : jsonencode({})
-
+  assume_role_policy = data.aws_iam_policy_document.app_s3_assume_role[0].json
+  
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-app-s3-role"
     Environment = var.environment
@@ -227,7 +245,7 @@ resource "aws_iam_role" "app_s3" {
 }
 
 resource "aws_iam_policy" "s3_access" {
-  count = var.enable_s3_access ? 1 : 0
+  count = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
   name = "${var.project_name}-${var.environment}-s3-access-policy"
   description = "S3 bucket access policy for Smartcity application"
@@ -255,7 +273,7 @@ resource "aws_iam_policy" "s3_access" {
 
 
 resource "aws_iam_role_policy_attachment" "app_s3" {
-  count = var.enable_s3_access ? 1 : 0
+  count = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
   policy_arn = aws_iam_policy.s3_access[0].arn
   role = aws_iam_role.app_s3[0].name
@@ -328,7 +346,7 @@ resource "aws_iam_role_policy_attachment" "app_sqs" {
 
 # 5c. RDS Access Role for Application
 resource "aws_iam_role" "app_rds" {
-  count = var.enable_rds_access ? 1 : 0
+  count = var.enable_rds_access && var.create_oidc_provider ? 1 : 0
 
   name = "${var.project_name}-${var.environment}-app-rds-role"
 
@@ -358,7 +376,7 @@ resource "aws_iam_role" "app_rds" {
 
 # RDS IAM Authentication Policy
 resource "aws_iam_policy" "rds_access" {
-  count = var.enable_rds_access ? 1 : 0
+  count = var.enable_rds_access && var.create_oidc_provider ? 1 : 0
 
   name = "${var.project_name}-${var.environment}-rds-access-policy"
   description = "RDS IAM authentication access policy"
@@ -380,7 +398,7 @@ resource "aws_iam_policy" "rds_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "app_rds" {
-  count = var.enable_rds_access ? 1 : 0
+  count = var.enable_rds_access && var.create_oidc_provider ? 1 : 0
 
   policy_arn = aws_iam_policy.rds_access[0].arn
   role = aws_iam_role.app_rds[0].name
