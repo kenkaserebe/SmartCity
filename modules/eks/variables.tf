@@ -19,7 +19,7 @@ variable "environment" {
 
 variable "private_subnet_ids" {
   description   = "List of private subnet IDs for the EKS cluster and nodes"
-  type          = string
+  type          = set(string)
 }
 
 variable "cluster_role_arn" {
@@ -62,7 +62,6 @@ variable "common_tags" {
 variable "kubernetes_version" {
   description   = "Kubernetes version for the cluster"
   type          = string
-  default       = "1.28"
 }
 
 
@@ -247,19 +246,16 @@ variable "create_oidc_provider" {
 variable "vpc_cni_version" {
   description   = "Version of VPC-CNI add-on"
   type          = string
-  default       = "latest"
 }
 
 variable "coredns_version" {
   description   = "Version of CoreDNS add-on"
   type          = string
-  default       = "latest"
 }
 
 variable "kube_proxy_version" {
   description   = "Version of kube-proxy add-on"
   type          = string
-  default       = "latest"
 }
 
 variable "enable_lb_controller" {

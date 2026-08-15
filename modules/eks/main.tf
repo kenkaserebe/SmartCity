@@ -9,6 +9,9 @@
 # - AWS Load Balancer Controller integration
 # ===========================================================================================
 
+terraform {
+  backend "s3" {}
+}
 
 # ===========================================================================================
 # DATA SOURCES
@@ -67,7 +70,7 @@ resource "aws_eks_cluster" "main" {
 resource "aws_kms_key" "eks" {
   count                     = var.kms_key_arn == "" ? 1 : 0
 
-  description               = "EKS secrets encryption key for ${var.project_name}-${ver.environment}"
+  description               = "EKS secrets encryption key for ${var.project_name}-${var.environment}"
   deletion_window_in_days   = 7
   enable_key_rotation       = true
 
@@ -133,7 +136,7 @@ resource "aws_eks_node_group" "main" {
   lifecycle {
     create_before_destroy = true
     ignore_changes = [ 
-        scaling_config.desired_size    # Allow autoscaling to modify desired size
+        scaling_config[0].desired_size    # Allow autoscaling to modify desired size
      ]
   }
 
@@ -216,7 +219,7 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 
   client_id_list = [ "sts.amazonaws.com" ]
   thumbprint_list = [ data.tls_certificate.cluster.certificates[0].sha1_fingerprint ]
-  url = aws_eks_cluster.main.identity[0].iodc[0].issuer
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-iodc-provider"

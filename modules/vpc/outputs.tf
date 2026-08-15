@@ -42,6 +42,14 @@ output "private_subnets" {
   }
 }
 
+output "private_subnet_ids" {
+  description = "Set of private subnet IDs"
+
+  value = toset([
+    for subnet in aws_subnet.private : subnet.id
+  ])
+}
+
 output "database_subnets" {
     description = "Map of AZ => database subnet IDs"
     value = {

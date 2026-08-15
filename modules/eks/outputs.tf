@@ -153,12 +153,6 @@ output "kubeconfig" {
                     data.aws_region.current.name
                 ]
                 interactiveMode = "Never"
-                env = [
-                    {
-                        name = "AWS_PROFILE"
-                        value = var.aws_profile
-                    }
-                ]
             }
         }
     }]

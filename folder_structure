@@ -9,20 +9,23 @@ smartcity/
 │   │   |---security-groups/
 |   |   |   |---terragrunt.hcl
 |   |   |
-│   │   |---outputs.tf
-|   |   |---README.md
+│   │   |---eks/
+|   |   |   |---terragrunt.hcl
+|   |   |
+|   |   |---iam/
+|   |   |   |---terragrunt.hcl
 |   |
 │   |---staging/
-│   │   |--- main.tf
-│   │   |---variables.tf
-│   │   |---outputs.tf
-|   |   |---README.md
+│   │   |---
+│   │   |---
+│   │   |---
+|   |   |---
 |   |
 │   |---prod/
-│       |--- main.tf
-│       |---variables.tf
-│       |---outputs.tf
-|       |---README.md
+│       |---
+│       |---
+│       |---
+|       |---
 |       
 |---modules/
 │   |--- vpc/

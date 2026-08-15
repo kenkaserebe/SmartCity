@@ -59,7 +59,7 @@ inputs = {
     ]
 
     # Kubernetes Version
-    kubernetes_version = "1.28"
+    kubernetes_version = "1.36"
 
     # Endpoint Configuration
     endpoint_private_access = true
@@ -84,9 +84,9 @@ inputs = {
     create_oidc_provider = true
 
     # Add-ons
-    vpc_cni_version = "latest"
-    coredns_version = "latest"
-    kube_proxy_version = "latest"
+    vpc_cni_version = "v1.23.0-eksbuild.1"
+    coredns_version = "v1.14.3-eksbuild.3"
+    kube_proxy_version = "v1.36.0-eksbuild.14"
     enable_lb_controller = false    # Enable if using ALB/NLB
 
     # Common tags
