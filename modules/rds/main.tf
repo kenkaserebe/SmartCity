@@ -28,9 +28,9 @@ data "aws_region" "current" {}
 # ======================================================================================
 
 resource "aws_db_subnet_group" "main" {
-  name = "${var.project_name}-${var.environment}-db-subnet-group"
+  name        = "${var.project_name}-${var.environment}-db-subnet-group"
   description = "Database subnet group for ${var.project_name}-${var.environment}"
-  subnet_ids = var.database_subnet_ids
+  subnet_ids  = var.database_subnet_ids
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-db-subnet-group"
@@ -46,61 +46,70 @@ resource "aws_db_subnet_group" "main" {
 # ======================================================================================
 
 resource "aws_db_parameter_group" "main" {
-  name = "${var.project_name}-${var.environment}-postgres-${var.postgres_version}"
-  family = "postgres${var.postgres_version_major}"
+  name        = "${var.project_name}-${var.environment}-postgres"
+  family      = "postgres${var.postgres_version_major}"
   description = "Custom parameter group for ${var.project_name}-${var.environment}"
 
   parameter {
-    name = "max_connections"
-    value = var.max_connections
+    name          = "effective_cache_size"
+    value         = var.effective_cache_size
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "shared_buffers"
-    value = var.shared_buffers
+    name          = "log_min_duration_statement"
+    value         = var.log_min_duration_statement
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "effective_cache_size"
-    value = var.effective_cache_size
+    name          = "log_statement"
+    value         = var.log_statement
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "work_mem"
-    value = var.work_mem
+    name          = "maintenance_work_mem"
+    value         = var.maintenance_work_mem
+    apply_method  = "pending-reboot"    
   }
 
   parameter {
-    name = "maintenance_work_mem"
-    value = var.maintenance_work_mem
+    name          = "max_connections"
+    value         = var.max_connections
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "wal_buffers"
-    value = var.wal_buffers
+    name          = "random_page_cost"
+    value         = var.random_page_cost
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "random_page_cost"
-    value = var.random_page_cost
+    name          = "shared_buffers"
+    value         = var.shared_buffers
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "log_statement"
-    value = var.log_statement
+    name          = "wal_buffers"
+    value         = var.wal_buffers
+    apply_method  = "pending-reboot"
   }
 
   parameter {
-    name = "log_min_duration_statement"
-    value = var.log_min_duration_statement
+    name          = "work_mem"
+    value         = var.work_mem
+    apply_method  = "pending-reboot"
   }
   
   dynamic "parameter" {
     for_each = var.extra_parameters
     content {
-      name = parameter.value.name
-      value = parameter.value.value
-      apply_method = try(parameter.value.apply_method, "immediate")
+      name          = parameter.value.name
+      value         = parameter.value.value
+      apply_method  = try(parameter.value.apply_method, "pending-reboot")
     }
   }
 
@@ -140,11 +149,13 @@ resource "aws_db_instance" "main" {
   # Identifier
   identifier = "${var.project_name}-${var.environment}-postgres"
 
+  skip_final_snapshot = true
+
   # Engine
   engine = "postgres"
   engine_version = var.postgres_version
 #   family = "postgres${var.postgres_version_major}"
-  engine_version_actual = var.postgres_version
+  # engine_version_actual = var.postgres_version
 
   # Instance Type
   instance_class = var.instance_class
@@ -165,7 +176,7 @@ resource "aws_db_instance" "main" {
   # Network
   db_subnet_group_name = aws_db_subnet_group.main.name
   vpc_security_group_ids = var.security_group_ids
-  availability_zone = var.availability_zone
+  # availability_zone = var.availability_zone
 
   # High Availability
   multi_az = var.multi_az

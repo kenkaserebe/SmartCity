@@ -57,6 +57,14 @@ output "database_subnets" {
   }
 }
 
+output "database_subnet_ids" {
+  description = "Set of database subnet IDs"
+
+  value = toset([
+    for subnet in aws_subnet.database : subnet.id
+  ])
+}
+
 output "public_subnet_cidrs" {
   description = "Map of AZ => public subnet CIDRs"
   value = {

@@ -40,8 +40,8 @@ inputs = {
     # Database Configuration
     database_name = "smartcity"
     port = 5432
-    postgres_version = "15.4"
-    postgres_version_major = "15"
+    postgres_version = "18.3"
+    postgres_version_major = "18"
 
     # Credentials (Use AWS Secrets Manager for production)
     username = "smartcity_admin"
@@ -56,7 +56,7 @@ inputs = {
 
     # High Availability (Disable for dev to save costs)
     multi_az = true
-    availability_zone = "eu-west-2a"
+    # availability_zone = "eu-west-2a"
 
     # Backups
     backup_retention_period = 7
@@ -66,13 +66,13 @@ inputs = {
     # Deletion Protection
     deletion_protection = false    # Enable for prod
 
-    # Parameter Groups
+    # Parameter Groups  # aws rds describe-db-parameters --db-parameter-group-name default.postgres18
     max_connections = "100"
-    shared_buffers = "128MB"
-    effective_cache_size = "512MB"
-    work_mem = "4MB"
-    maintenance_work_mem = "64MB"
-    wal_buffers = "4MB"
+    shared_buffers = "131072"
+    effective_cache_size = "524288"
+    work_mem = "4096"
+    maintenance_work_mem = "65536"
+    wal_buffers = "4096"
     random_page_cost = "1.1"
     log_statement = "ddl"
     log_min_duration_statement = "5000"
