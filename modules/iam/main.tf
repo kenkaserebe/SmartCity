@@ -61,6 +61,12 @@ resource "aws_iam_role_policy_attachment" "eks_compute_policy" {
   role          = aws_iam_role.eks_cluster.name
 }
 
+# S3 access - For applications
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  policy_arn  = dependency.s3.outputs.iam_policy_arn
+  role        = dependency.iam.outputs.eks_node_role_name
+}
+
 # ===========================================================================================
 # 2. EKS NODE GROUP ROLE
 # ===========================================================================================
