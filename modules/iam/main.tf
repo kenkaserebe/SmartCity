@@ -61,11 +61,6 @@ resource "aws_iam_role_policy_attachment" "eks_compute_policy" {
   role          = aws_iam_role.eks_cluster.name
 }
 
-# S3 access - For applications
-resource "aws_iam_role_policy_attachment" "s3_access" {
-  policy_arn  = dependency.s3.outputs.iam_policy_arn
-  role        = dependency.iam.outputs.eks_node_role_name
-}
 
 # ===========================================================================================
 # 2. EKS NODE GROUP ROLE
@@ -263,9 +258,9 @@ resource "aws_iam_policy" "s3_access" {
             Effect = "Allow"
             Action = [
                 "s3:GetObject",
-                "s3;PutObject",
+                "s3:PutObject",
                 "s3:DeleteObject",
-                "s3:ListObject",
+                "s3:ListBucket",
                 "s3:GetBucketLocation"
             ]
             Resource = [
@@ -279,10 +274,10 @@ resource "aws_iam_policy" "s3_access" {
 
 
 resource "aws_iam_role_policy_attachment" "app_s3" {
-  count = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
+  count       = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
-  policy_arn = aws_iam_policy.s3_access[0].arn
-  role = aws_iam_role.app_s3[0].name
+  policy_arn  = aws_iam_policy.s3_access[0].arn
+  role        = aws_iam_role.app_s3[0].name
 }
 
 # 5b. SQS Access Role for Application

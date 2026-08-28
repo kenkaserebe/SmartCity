@@ -1,3 +1,8 @@
+terraform {
+  backend "s3" {}
+}
+
+
 # ===========================================================================
 # S3 Module - SmartCity IoT Platform
 # ===========================================================================
@@ -189,7 +194,7 @@ resource "aws_s3_bucket_public_access_block" "static_assets" {
 resource "aws_s3_bucket_versioning" "static_assets" {
   count     = var.enable_static_assets ? 1 : 0
 
-  bucket    = aws_s3_bucket.static_assets.id
+  bucket    = aws_s3_bucket.static_assets[count.index].id
 
   versioning_configuration {
     status = "Enabled"
@@ -246,7 +251,8 @@ resource "aws_iam_policy" "s3_access" {
 
   policy = jsonencode({
     Version     = "2012-10-17"
-    Statement   = [
+    Statement   = concat(
+      [
         # List buckets
         {
             Effect = "Allow"
@@ -257,9 +263,10 @@ resource "aws_iam_policy" "s3_access" {
             Resource = [
                 aws_s3_bucket.sensor_data.arn,
                 aws_s3_bucket.app_logs.arn,
-                var.enable_static_assets ? aws_s3_bucket.static_assets[0].arn : "${aws_s3_bucket.sensor_data.arn}-static"
+                # var.enable_static_assets ? aws_s3_bucket.static_assets[0].arn : "${aws_s3_bucket.sensor_data.arn}-static"
             ]
         },
+           
         # Read/Write sensor data
         {
             Effect = "Allow"
@@ -268,25 +275,27 @@ resource "aws_iam_policy" "s3_access" {
                 "s3:PutObject",
                 "s3:DeleteObject",
                 "s3:GetObjectVersion",
-                "s3:PutObjectAcl"
             ]
             Resource = [
                 "${aws_s3_bucket.sensor_data.arn}/*",
                 "${aws_s3_bucket.app_logs.arn}/*"
             ]
-        },
-        # Read-only for static assets
+        }
+      ],
+        # Allow access to static assets
+      var.enable_static_assets ? [
         {
             Effect = "Allow"
             Action = [
                 "s3:GetObject",
                 "s3:GetObjectVersion"
             ]
-            Resource = var.enable_static_assets ? [
+            Resource = [
                 "${aws_s3_bucket.static_assets[0].arn}/*"
-            ] : []
+            ]
         }
-    ]
+      ] : []
+    )    
   })
 }
 
