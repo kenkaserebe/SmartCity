@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 # =============================================================================
 # Monitoring Module - SmartCity IoT Platform
 # =============================================================================
@@ -70,8 +74,8 @@ resource "aws_cloudwatch_dashboard" "eks" {
             type = "metric"
             properties = {
                 metrics = [
-                    ["AWS/EKS", "cluster_failed_request_count", "cluster_name", aws_eks_cluster.mani.name],
-                    ["AWS/EKS", "node_group_node_count", "cluster_name", aws_eks_cluster.main.name]
+                    ["AWS/EKS", "cluster_failed_request_count", "cluster_name", data.aws_eks_cluster.main.name],
+                    ["AWS/EKS", "node_group_node_count", "cluster_name", data.aws_eks_cluster.main.name]
                 ]
                 period = 300
                 stat = "Average"
@@ -140,7 +144,7 @@ resource "aws_cloudwatch_metric_alarm" "eks_nodes" {
   alarm_actions = var.alarm_actions
 
   dimensions = {
-    cluster_name = aws_eks_cluster.main.name
+    cluster_name = data.aws_eks_cluster.main.name
   }
 
   tags = merge(var.common_tags, {

@@ -93,7 +93,7 @@ inputs = {
 
     # Common Tags
     common_tags = {
-        Environment "dev"
+        Environment = "dev"
         CostCenter = "development"
         Project = "SmartCity"
         ManagedBy = "Terragrunt"

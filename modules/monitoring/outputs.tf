@@ -67,7 +67,7 @@ output "grafana_role_arn" {
 output "monitoring_summary" {
   description = "Summary of monitoring resources"
   value = {
-    cloudwatch_dashboard = aws_cloudwatch_dashboard.ec2.dashboard_name
+    # cloudwatch_dashboard = aws_cloudwatch_dashboard.ec2.dashboard_name
     log_groups = length(aws_cloudwatch_log_group.eks_cluster) + length(aws_cloudwatch_log_group.rds) + length(aws_cloudwatch_log_group.application)
     sns_alerts = var.enable_sns_alerts
     prometheus = var.enable_prometheus
