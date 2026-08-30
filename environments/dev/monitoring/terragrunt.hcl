@@ -23,7 +23,7 @@ dependency "iam" {
     config_path = "../iam"
 
     mock_outputs = {
-        oidc_provider_arn = "arn:aws:iam:000000000000:oidc-provider/oidc.eks.eu-west-2.amazonaws.com/id/000000000000"
+        oidc_provider_arn = "arn:aws:iam::000000000000:oidc-provider/mock"
     }
 }
 

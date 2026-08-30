@@ -46,7 +46,7 @@ output "eks_node_instance_profile_arn" {
 
 output "oidc_provider_arn" {
   description   = "ARN of the OIDC provider"
-  value         = try(aws_iam_openid_connect_provider.cluster[0].arn, null)
+  value         = var.create_oidc_provider ? aws_iam_openid_connect_provider.cluster[0].arn : null    #try(aws_iam_openid_connect_provider.cluster[0].arn, null)
 }
 
 output "oidc_provider_url" {
