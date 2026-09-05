@@ -22,12 +22,12 @@ output "eks_cluster_role_name" {
 
 output "eks_node_role_arn" {
   description   = "ARN of the EKS node role"
-  value         = aws_iam_role.eks_node.arn
+  value         = aws_iam_role.eks_node_role.arn
 }
 
 output "eks_node_role_name" {
   description   = "Name of the EKS node role"
-  value         = aws_iam_role.eks_node.name
+  value         = aws_iam_role.eks_node_role.name
 }
 
 output "eks_node_instance_profile_name" {
@@ -100,7 +100,7 @@ output "iam_summary" {
   description   = "Summary of IAM resources created"
   value         = {
     eks_cluster_role    = aws_iam_role.eks_cluster.name
-    eks_node_role       = aws_iam_role.eks_node.name
+    eks_node_role       = aws_iam_role.eks_node_role.name
     oidc_provider       = try(aws_iam_openid_connect_provider.cluster[0].arn, null)
     s3_access           = var.enable_s3_access
     sqs_access          = var.enable_sqs_access

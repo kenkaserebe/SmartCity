@@ -56,7 +56,7 @@ resource "kubernetes_namespace" "smartcity" {
     }
 }
 
-resources "kubernetes_namespace" "monitoring" {
+resource "kubernetes_namespace" "monitoring" {
     count = var.deploy_monitoring ? 1 : 0
 
     metadata {

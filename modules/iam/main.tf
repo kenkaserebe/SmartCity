@@ -43,17 +43,20 @@ resource "aws_iam_role" "eks_cluster" {
   })
 }
 
+
 # EKS Cluster Policy - Required for cluster management
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   policy_arn    = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role          = aws_iam_role.eks_cluster.name
 }
 
+
 # EKS VPC Resource Controller - Required for VPC management
 resource "aws_iam_role_policy_attachment" "eks_vpc_resource_controller" {
   policy_arn    = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
   role          = aws_iam_role.eks_cluster.name
 }
+
 
 # EKS Compute Policy - For EC2 operations
 resource "aws_iam_role_policy_attachment" "eks_compute_policy" {
@@ -67,7 +70,8 @@ resource "aws_iam_role_policy_attachment" "eks_compute_policy" {
 # ===========================================================================================
 # The node role gives worker nodes permissions to join the cluster and access AWS services
 # ===========================================================================================
-resource "aws_iam_role" "eks_node" {
+
+resource "aws_iam_role" "eks_node_role" {
   name  = "${var.project_name}-${var.environment}-eks-node-role"
 
   assume_role_policy = jsonencode({
@@ -89,22 +93,23 @@ resource "aws_iam_role" "eks_node" {
   })
 }
 
+
 # EKS Worker Node Policy - Required for nodes to join cluster
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
   policy_arn    = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # EKS CNI Policy - Required for network management
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   policy_arn    = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # ECR Pull Policy - Allows nodes to pull container images
 resource "aws_iam_role_policy_attachment" "ecr_pull_policy" {
   policy_arn    = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # S3 Policy - For nodes to access S3 buckets (optional)
@@ -112,7 +117,7 @@ resource "aws_iam_role_policy_attachment" "s3_policy" {
   count         = var.enable_s3_access && var.create_oidc_provider ? 1 : 0
 
   policy_arn    = aws_iam_policy.s3_access[0].arn
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # SQS Policy - For nodes to access SQS queues (optional)
@@ -120,13 +125,13 @@ resource "aws_iam_role_policy_attachment" "sqs_policy" {
   count         = var.enable_sqs_access ? 1 : 0
 
   policy_arn    = aws_iam_policy.sqs_access[0].arn
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # CloudWatch Logs Policy - For node logging
 resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
   policy_arn    = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 # SSM Policy - For node management (optional)
@@ -134,7 +139,7 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
   count         = var.enable_ssm_access ? 1 : 0
 
   policy_arn    = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  role          = aws_iam_role.eks_node.name
+  role          = aws_iam_role.eks_node_role.name
 }
 
 
@@ -145,7 +150,7 @@ resource "aws_iam_role_policy_attachment" "ssm_policy" {
 # ==========================================================================================
 resource "aws_iam_instance_profile" "eks_node" {
   name = "${var.project_name}-${var.environment}-eks-node-instance-profile"
-  role = aws_iam_role.eks_node.name
+  role = aws_iam_role.eks_node_role.name
 
   tags = merge(var.common_tags, {
     Name        = "${var.project_name}-${var.environment}-eks-node-instance-profile"

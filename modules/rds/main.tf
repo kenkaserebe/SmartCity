@@ -154,7 +154,7 @@ resource "aws_db_instance" "main" {
   # Engine
   engine = "postgres"
   engine_version = var.postgres_version
-#   family = "postgres${var.postgres_version_major}"
+  # family = "postgres${var.postgres_version_major}"
   # engine_version_actual = var.postgres_version
 
   # Instance Type
@@ -168,7 +168,7 @@ resource "aws_db_instance" "main" {
   kms_key_id = var.kms_key_arn != "" ? var.kms_key_arn : null
 
   # Database Settings
-#   database_name = var.database_name
+  # database_name = var.database_name
   username = var.username
   password = var.password
   port = var.port
@@ -348,8 +348,8 @@ resource "aws_db_proxy" "main" {
   vpc_security_group_ids = var.security_group_ids
   require_tls = true
   idle_client_timeout = var.proxy_idle_client_timeout
-#   max_connections_percent = var.proxy_max_connection_percent
-#   max_idle_connections_percent = var.proxy_max_idle_connections_percent
+  #  max_connections_percent = var.proxy_max_connection_percent
+  # max_idle_connections_percent = var.proxy_max_idle_connections_percent
 
   # Debug logging
   debug_logging = var.proxy_debug_logging

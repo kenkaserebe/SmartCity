@@ -25,7 +25,7 @@ inputs = {
     environment                 = "dev"
 
     # IRSA Configuration - OIDC will be created after EKS cluster exists
-    create_oidc_provider = true
+    create_oidc_provider = false 
     namespace = "default"
 
     # Service access flags - enable what you need
