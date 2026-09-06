@@ -119,7 +119,7 @@ variable "eks_min_nodes" {
 variable "oidc_provider_arn" {
   description = "ARN of the OIDC provider for IRSA"
   type = string
-  default = ""
+  # default = ""
 }
 
 variable "oidc_issuer_url" {

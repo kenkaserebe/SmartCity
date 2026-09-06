@@ -19,14 +19,6 @@ dependency "eks" {
     }
 }
 
-dependency "iam" {
-    config_path = "../iam"
-
-    mock_outputs = {
-        oidc_provider_arn = "arn:aws:iam::000000000000:oidc-provider/mock"
-    }
-}
-
 dependency "rds" {
     config_path = "../rds"
 
@@ -75,7 +67,7 @@ inputs = {
     sqs_depth_threshold = 100
 
     # OIDC Configuration
-    oidc_provider_arn = dependency.iam.outputs.oidc_provider_arn
+    oidc_provider_arn = dependency.eks.outputs.oidc_provider_arn
 
     # Prometheus & Grafana
     enable_prometheus = true
