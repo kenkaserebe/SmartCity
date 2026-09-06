@@ -99,7 +99,7 @@ variable "rds_username" {
 
 variable "rds_password" {
     description = "RDS password"
-    type        = true
+    type        = string
 }
 
 
@@ -110,6 +110,7 @@ variable "rds_password" {
 variable "sqs_queue_url" {
     description = "SQS queue URL"
     type        = string
+    sensitive   = true
 }
 
 
@@ -206,7 +207,7 @@ variable "api_memory_limit" {
 variable "worker_cpu_request" {
     description = "CPU request for Sensor Worker"
     type        = string
-    default     = 100m
+    default     = "100m"
 }
 
 variable "worker_cpu_limit" {

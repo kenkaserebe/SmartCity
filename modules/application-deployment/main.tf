@@ -130,10 +130,10 @@ resource "kubernetes_secret" "app_secrets" {
 
     data {
         # Database password (base64 encoded)
-        "DB_PASSWORD"   = base64encode(var.rds_password)
+        DB_PASSWORD   = base64encode(var.rds_password)
 
         # API Keys 
-        "API_KEY"       = base64encode(var.api_key)
+        API_KEY       = base64encode(var.api_key)
     }
 
     type = "Opaque"
