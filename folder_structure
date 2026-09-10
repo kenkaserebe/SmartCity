@@ -15,6 +15,21 @@ smartcity/
 |   |   |---iam/
 |   |   |   |---terragrunt.hcl
 |   |
+|   |   |---eks/
+|   |   |   |---terragrunt.hcl
+|   |
+|   |   |---rds/
+|   |   |   |---terragrunt.hcl
+|   |
+|   |   |---sqs/
+|   |   |   |---terragrunt.hcl
+|   |
+|   |   |---monitoring/
+|   |   |   |---terragrunt.hcl
+|   |
+|   |   |---application-deployment/
+|   |   |   |---terragrunt.hcl
+|   |
 │   |---staging/
 │   │   |---
 │   │   |---
@@ -70,10 +85,15 @@ smartcity/
 |   |   |---README.md
 |   |
 │   |---monitoring/
-│       |---main.tf
-│       |---variables.tf
-│       |---outputs.tf
-|       |---README.md
+│   |   |---main.tf
+│   |   |---variables.tf
+│   |   |---outputs.tf
+|   |   |---README.md
+|   |
+|   |---application-deployment
+|       |---main.tf
+|       |---variables.tf
+|       |---outputs.tf
 |
 |---global/
 │   |---backend/
