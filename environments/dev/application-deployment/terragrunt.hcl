@@ -68,6 +68,10 @@ remote_state {
 # =================================================================================================
 
 inputs = {
+    environment = "dev"
+    project_name = "smartcity"
+    region          = "eu-west-2"
+
     # ==========================================================================
     # EKS cluster
     # ==========================================================================
@@ -104,7 +108,7 @@ inputs = {
     # ==========================================================================
     rds_endpoint    = dependency.rds.outputs.db_endpoint
     rds_port        = dependency.rds.outputs.db_port
-    # rds_db_name     = dependency.rds.outputs.db_name
+    rds_db_name     = "smartcity"
     rds_username    = dependency.rds.outputs.db_username
     rds_password    = "ChangeMe123!" # Use AWS Secrets Manager in production
 

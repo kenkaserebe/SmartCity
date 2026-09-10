@@ -41,7 +41,7 @@ output "ingress_host" {
 
 output "nginx_ingress_load_balancer" {
     description = "NGINX Ingress Load Balancer hostname"
-    value       = try(helm_release.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname, null)
+    value       = var.deploy_ingress_controller ? try(data.kubernetes_service_v1.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname, null) : null
 }
 
 
@@ -49,16 +49,14 @@ output "nginx_ingress_load_balancer" {
 # DEPLOYMENT OUTPUTS
 # ===========================================================================
 
-
-output "api_deployment_status" {
-    description = "Status of API Gateway deployment"
-    value       = kubernetes_deployment.api_gateway.status[0].available_replicas
+output "api_deployment_replicas" {
+    description = "Desired number of API Gateway replicas"
+    value       = var.api_replicas
 }
 
-
-output "worker_deployment_status" {
-    description = "Status of Sensor Worker deployment"
-    value       = kubernetes_deployment.worker.status[0].available_replicas
+output "worker_deployment_replicas" {
+    description = "Desired number of Sensor Worker replicas"
+    value       = var.worker_replicas
 }
 
 
@@ -75,6 +73,6 @@ output "application_summary" {
         api_replicas    = var.api_replicas
         worker_replicas = var.worker_replicas
         ingress_host    = var.domain_name
-        nginx_ingress   = try(helm_release.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname, null)
+        nginx_ingress   = var.deploy_ingress_controller ? try(data.kubernetes_service_v1.nginx_ingress[0].status[0].load_balancer[0].ingress[0].hostname, null) : null
     }
 }

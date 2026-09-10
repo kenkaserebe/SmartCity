@@ -11,6 +11,18 @@
 
 terraform {
   backend "s3" {}
+
+#   required_providers {
+#     kubernetes = {
+#         host                    = var.eks_cluster_endpoint
+#         cluster_ca_certificate  = base64decode(var.eks_cluster_ca)
+#         exec {
+#             api_version = "client.authentication.k8s.io/v1beta1"
+#             command     = "aws"
+#             args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name, "--region", var.region]
+#         }
+#     }
+#   }
 }
 
 
@@ -29,10 +41,10 @@ provider "kubernetes" {
 }
 
 provider "helm" {
-    kubernetes {
+    kubernetes = {
         host                    = var.eks_cluster_endpoint
-        cluster_ca_certificate  = hase64decode(var.eks_cluster_ca)
-        exec {
+        cluster_ca_certificate  = base64decode(var.eks_cluster_ca)
+        exec = {
             api_version = "client.authentication.k8s.io/v1beta1"
             command     = "aws"
             args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name, "--region", var.region]
@@ -125,10 +137,10 @@ resource "kubernetes_config_map" "app_config" {
 resource "kubernetes_secret" "app_secrets" {
     metadata {
         name        = "smartcity-secrets"
-        namespace   = "smartcity-secrets"
+        namespace   = kubernetes_namespace.smartcity.metadata[0].name
     }
 
-    data {
+    data = {
         # Database password (base64 encoded)
         DB_PASSWORD   = base64encode(var.rds_password)
 
@@ -144,7 +156,7 @@ resource "kubernetes_secret" "app_secrets" {
 # 5. API GATEWAY DEVELOPMENT
 # ===========================================================================
 
-resource "kubernetes_deployment" {
+resource "kubernetes_deployment" "api_gateway" {
     metadata {
         name        = "api-gateway"
         namespace   = kubernetes_namespace.smartcity.metadata[0].name
@@ -189,7 +201,7 @@ resource "kubernetes_deployment" {
                     }
 
                     env_from {
-                        secret_reg {
+                        secret_ref {
                             name = kubernetes_secret.app_secrets.metadata[0].name
                         }
                     }
@@ -210,7 +222,7 @@ resource "kubernetes_deployment" {
                             memory  = var.api_memory_limit
                         }
                         requests = {
-                            cpu     = var.api_cpu_requests
+                            cpu     = var.api_cpu_request
                             memory  = var.api_memory_request
                         }
                     }
@@ -392,7 +404,7 @@ controller:
         type: LoadBalancer
         annotations:
             service.beta.kubernetes.io/aws-load-balancer-type: nlb
-            service.beta.kubernetes.io/asw-load-balancer-scheme: internet-facing
+            service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
     ingressClass: nginx
     watchIngressWithoutClass: true
     config:
@@ -409,6 +421,20 @@ EOF
 }
 
 
+data "kubernetes_service_v1" "nginx_ingress" {
+    count = var.deploy_ingress_controller ? 1 : 0
+
+    metadata {
+        name        = "ingress-nginx-controller"
+        namespace   = kubernetes_namespace.ingress[0].metadata[0].name
+    }
+
+    depends_on = [
+        helm_release.nginx_ingress
+    ]
+}
+
+
 # ===========================================================================
 # 9. INGRESS RULES
 # ===========================================================================
@@ -421,7 +447,7 @@ resource "kubernetes_ingress_v1" "smartcity" {
             "kubernetes.io/ingress.class"                   = "nginx"
             "nginx.ingress.kubernetes.io/rewrite-target"    = "/"
             "nginx.ingress.kubernetes.io/proxy-body-size"   = "10m"
-            "nginx.ingress.kubernetes.io/ssl-redirect"      = "true" if var.enable_tls else "false"
+            "nginx.ingress.kubernetes.io/ssl-redirect"      = var.enable_tls ? "true" : "false"
         }
     }
 
@@ -521,7 +547,7 @@ resource "kubernetes_ingress_class" "nginx" {
     }
 
     spec {
-        controller = "k8.io/ingress-nginx"
+        controller = "k8s.io/ingress-nginx"
     }
 }
 
@@ -549,7 +575,7 @@ resource "kubernetes_manifest" "service_monitor_api" {
                     app = "api-gateway"
                 }
             }
-            endpoints = = [
+            endpoints = [
                 {
                     port        = "metrics"
                     path        = "/metrics"
@@ -557,7 +583,7 @@ resource "kubernetes_manifest" "service_monitor_api" {
                 }
             ]
             namespace_selector = {
-                match_labels [
+                match_labels = [
                     kubernetes_namespace.smartcity.metadata[0].name
                 ]
             }

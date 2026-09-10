@@ -274,14 +274,14 @@ variable "enable_tls" {
 }
 
 variable "tls_certificate" {
-    description = "TLS certificate (base64 encoded)"
+    description = "TLS certificate PEM content"
     type        = string
     sensitive   = true
     default     = ""
 }
 
 variable "tls_private_key" {
-    description = "TLS private key (base64 encoded)"
+    description = "TLS private key PEM content"
     type        = string
     sensitive   = true
     default     = ""
@@ -292,7 +292,7 @@ variable "tls_private_key" {
 # MONITORING
 # ===========================================================================
 
-variable "enable_service_monitors" {
+variable "enable_service_monitor" {
     description = "Enable ServiceMonitors for Prometheus"
     type        = bool
     default     = true

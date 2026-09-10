@@ -78,7 +78,7 @@ variable "endpoint_private_access" {
 variable "endpoint_public_access" {
   description   = "Enable public API server endpoint (internet access)"
   type          = bool
-  default       = false
+  default       = true
 }
 
 variable "endpoint_public_access_cidrs" {

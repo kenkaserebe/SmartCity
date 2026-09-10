@@ -38,7 +38,7 @@ resource "aws_eks_cluster" "main" {
     security_group_ids      = var.cluster_security_group_ids
     endpoint_private_access = var.endpoint_private_access
     endpoint_public_access  = var.endpoint_public_access
-    public_access_cidrs     = var.endpoint_public_access_cidrs
+    public_access_cidrs     = ["82.43.137.253/32"] #var.endpoint_public_access_cidrs
   }
 
   # Enable encryption for Kubernetes secrets

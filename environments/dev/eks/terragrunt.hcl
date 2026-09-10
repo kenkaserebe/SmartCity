@@ -63,7 +63,7 @@ inputs = {
 
     # Endpoint Configuration
     endpoint_private_access = true
-    endpoint_publice_access = false     # Private only for dev
+    endpoint_publice_access = true     # Private only for dev
 
     # Node Group Configuration
     node_instance_types = ["t3.medium"]
