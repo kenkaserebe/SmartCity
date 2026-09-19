@@ -128,7 +128,6 @@ The API and worker workloads have independent resource limits and autoscaling co
 
 ---
 
-Repository Structure
+Repository Structure[a link](https://github.com/kenkaserebe/SmartCity/blob/main/folder_structure)
 
-[a link](https://github.com/kenkaserebe/SmartCity/blob/main/folder_structure)
-
+The separation between `modules/` and `environments/` allows infrastructure logic to be reused while keeping environment-specific settings isolated.
