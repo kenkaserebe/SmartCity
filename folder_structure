@@ -9,26 +9,29 @@ smartcity/
 │   │   |---security-groups/
 |   |   |   |---terragrunt.hcl
 |   |   |
+|   |   |---s3/
+|   |   |   |---terragrunt.hcl
+|   |   |
 │   │   |---eks/
 |   |   |   |---terragrunt.hcl
 |   |   |
 |   |   |---iam/
 |   |   |   |---terragrunt.hcl
-|   |
+|   |   |
 |   |   |---eks/
 |   |   |   |---terragrunt.hcl
-|   |
+|   |   |
 |   |   |---rds/
 |   |   |   |---terragrunt.hcl
-|   |
+|   |   |
 |   |   |---sqs/
 |   |   |   |---terragrunt.hcl
-|   |
+|   |   |
 |   |   |---monitoring/
 |   |   |   |---terragrunt.hcl
-|   |
+|   |   |
 |   |   |---application-deployment/
-|   |   |   |---terragrunt.hcl
+|   |       |---terragrunt.hcl
 |   |
 │   |---staging/
 │   │   |---
