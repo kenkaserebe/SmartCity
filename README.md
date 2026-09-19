@@ -18,4 +18,7 @@ The architecture separates reusable infrastructure modules from environment-spec
 ```mermaid
 flowchart TD
     A["AWS Account<br/><br/>eu-west-2"]
+    B["VPC<br/><br/>Public / Private / DB<br/>Subnets<br/><br/>IGW + NAT + Flow logs]
+
+    A --> B
 ```
