@@ -19,6 +19,10 @@ The architecture separates reusable infrastructure modules from environment-spec
 flowchart TD
     A["AWS Account<br/><br/>eu-west-2"]
     B["VPC<br/><br/>Public / Private / DB<br/>Subnets<br/><br/>IGW + NAT + Flow logs"]
+    C["Amazon EKS<br/><br/>API Gateway<br/>Sensor Worker<br/>Ingress<br/>Autoscaling"]
+    D["Amazon RDS<br/>PostgreSQL<br/><br/>Application DB"]
 
     A --> B
+    B --> C
+    B --> D
 ```
