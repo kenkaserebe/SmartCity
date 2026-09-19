@@ -128,6 +128,119 @@ The API and worker workloads have independent resource limits and autoscaling co
 
 ---
 
-Repository Structure[a link](https://github.com/kenkaserebe/SmartCity/blob/main/folder_structure)
+Repository Structure
+
+[Click to see folder structure](https://github.com/kenkaserebe/SmartCity/blob/main/folder_structure)
 
 The separation between `modules/` and `environments/` allows infrastructure logic to be reused while keeping environment-specific settings isolated.
+
+---
+
+## Architecture Principles
+
+### Modular Infrastructure
+
+Reusable Terraform modules live under:
+
+modules/
+
+
+Environment configuration lives under:
+
+environments/
+
+
+Terragrunt connects the two.
+For example:
+
+environments/dev/eks/terragrunt.hcl
+              |
+              |
+              ---> modules/eks/
+
+This keeps infrastructure implementation separate from deployment configuration.
+
+
+### Environment Isolation
+
+The intended environment model is:
+
+dev
+staging
+prod
+
+Each environment can provide different:
+
+- Instance sizes
+- Scaling limits
+- Network configuration
+- Kubernetes versions
+- Database settings
+- Monitoring configuration
+- Application images
+- Security controls
+
+
+### Dependency Management
+
+Terragrunt dependencies are used to pass outputs between infrastructure layers.
+
+For example:
+
+VPC
+ |
+ |---Security Groups
+ |
+ |---IAM
+ |
+ |---EKS
+ |    |---Application Deployment
+ |
+ |---RDS
+
+The development EKS configuration consumes outputs from the VPC, Security Groups and IAM layers.
+
+
+---
+
+Prerequisites
+
+Before deploying SmartCity, install:
+
+- Terraform
+- Terragrunt
+- AWS CLI
+- kubectl
+- Helm
+- An AWS account with permissions to create the required infrastructure
+
+Authenticate to AWS:
+
+```bash
+aws configure
+```
+
+Verify access:
+
+```bash
+aws sts get-caller-identity
+```
+
+### Remote State
+
+SmartCity uses an encrypted S3 backend for Terraform state.
+
+The root Terragrunt configuration defines:
+
+Backend:    S3
+Region:     eu-west-2
+Encrypt:    true
+Locking:    enabled
+
+The repository also contains a dedicated backend bootstrap under:
+
+global/backend/
+
+The backend bucket should be provisioned and verified before deploying dependent infrastructure.
+
+> **Important:** Terraform state can contain sensitive infrastructure information. Protect the state bucket and restrict access through IAM.
