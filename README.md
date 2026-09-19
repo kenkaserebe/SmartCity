@@ -449,3 +449,230 @@ Before promoting an environment to production:
 #### AWS
 
 - [ ] Dedicated AWS account
+- [ ] Restricted IAM roles
+- [ ] MFA enforced
+- [ ] CloudTrail enabled
+- [ ] AWS Config / security monitoring enabled
+- [ ] Budget and cost alerts configured
+- [ ] GuardDuty enabled
+- [ ] Production KMS keys configured
+
+#### Networking
+
+- [ ] Private EKS endpoint appropriate
+- [ ] Restricted public endpoint CIDRs
+- [ ] Security groups reviewed
+- [ ] Network ACLs reviewed
+- [ ] VPC Flow Logs enabled
+- [ ] NAT architecture reviewed for cost and availability
+
+#### Kubernetes
+
+- [ ] Production Kubernetes version selected
+- [ ] Node groups sized appropriately
+- [ ] Pod resource requests/limits reviewed
+- [ ] HPA thresholds reviewed
+- [ ] PDB configuration reviewed
+- [ ] Network policies considered
+- [ ] RBAC reviewed
+- [ ] Image scanning enabled
+
+#### Data
+
+- [ ] RDS deletion protection enabled
+- [ ] RDS backups configured
+- [ ] Multi-AZ strategy confirmed
+- [ ] Database credentials stored in Secrets Manager
+- [ ] S3 versioning enabled where required
+- [ ] S3 lifecycle policies reviewed
+- [ ] Data retention requirements documented
+
+#### Application
+
+- [ ] Production container images pinned
+- [ ] No `latest` image tags
+- [ ] Production API keys configured securely
+- [ ] TLS certificates configured
+- [ ] DNS configured
+- [ ] Ingress reviewed
+- [ ] Health checks validated
+- [ ] Monitoring and alerting enabled
+
+---
+
+### Useful Commands
+
+Validate Terraform
+`terragrunt run --all validate`
+
+Format Terraform
+`terraform fmt -recursive`
+
+Plan
+`terragrunt run --all plan --backend-bootstrap`
+
+Apply
+`terragrunt run --all apply --backend-bootstrap`
+
+Destroy
+`terragrunt run --all destroy`
+
+> Use **destroy** with extreme caution. Some modules contain development-oriented destructive settings.
+
+Check AWS resources
+`aws resourcegroupstaggingapi get-resources --tag-filters Key=Project,Values=SmartCity`
+
+Check EKS
+`aws eks describe-cluster --name smartcity-dev-eks-cluster --region eu-west-2`
+
+Check Kubernetes workloads
+`kubectl get all -n smartcity`
+
+Check logs
+`kubectl logs -n smartcity deployment/api-gateway`
+
+Worker logs
+`kubectl logs -n smartcity deployment/sensor-worker`
+
+### Development workflow
+
+A recommended workflow for infrastructure changes:
+
+1. Modify module
+        |
+        ▼
+2. Update environment configuration
+        |
+        ▼
+3. terraform fmt
+        |
+        ▼
+4. terragrunt plan
+        |
+        ▼
+5. Review infrastructure diff
+        |
+        ▼
+6. Apply to development
+        |
+        ▼
+7. Validate AWS resources
+        |
+        ▼
+8. Validate Kubernetes workloads
+        |
+        ▼
+9. Promote through environments
+
+Keep reusable infrastructure logic in `modules/` and environment-specific values in `environments/`.
+
+---
+
+### Design Goals
+
+SmartCity is built around several core principles:
+
+##### Infrastructure as Code
+
+Every infrastructure component should be reproducible and version controlled.
+
+##### Modularity
+
+Infrastructure components are implemented as reusable Terraform modules.
+
+##### Environment separation
+
+Development, staging and production configurations should remain independently configurable.
+
+##### Least privilege
+
+AWS and Kubernetes access should be scoped to the minimum required permissions.
+
+##### Observability
+
+Infrastructure and application workloads should expose sufficient logs and metrics to operate the platform reliably.
+
+##### Scalability
+
+Compute, Kubernetes workloads, storage and messaging should be capable of scaling independently.
+
+##### Security by default
+
+Private networking, encryption, access controls and monitoring shoud form the baseline rather than an afterthought.
+
+---
+
+### Roadmap
+
+Potential improvements for the platform include:
+
+- [ ] Complete staging environment configuration
+- [ ] Complete production environment configuration
+- [ ] Replace development secrets with AWS Secrets Manager
+- [ ] Remove hard-coded network/security values
+- [ ] Add Terraform CI validation
+- [ ] Add Terraform security scanning
+- [ ] Add policy-as-code checks
+- [ ] Add container image vulnerability scanning
+- [ ] Add GitHub Actions deployment pipelines
+- [ ] Add automated EKS upgrades
+- [ ] Add centralized observability
+- [ ] Add CloudWatch alarms
+- [ ] Add disaster-recovery procedures
+- [ ] Add automated database migration handling
+- [ ] Add cost monitoring and budgets
+- [ ] Document applicaton/API contracts
+
+---
+
+### Contributing
+
+Contributions are welcome.
+
+Before opening a pull request:
+
+1. Create a feature branch.
+2. Make the infrastructure change.
+3. Run formatting and validation.
+4. Run a Terragrunt plan against the relevant environment.
+5. Review the plan for unintended resource changes.
+6. Document any new variables or dependencies.
+7. Never commit credentials, private keys or environment-specific secrets.
+
+Example:
+
+```
+git checkout -b feature/my-infrastructure-change
+
+terraform fmt -recursive
+
+terragrunt run --all validate
+
+terragrunt run --all plan
+```
+
+---
+
+### License
+
+This project is licensed under the MIT License.
+
+The full license text is included in the repository as [LICENSE](https://github.com/kenkaserebe/SmartCity/blob/main/LICENSE)
+
+---
+
+### Project Status
+
+#### Active infrastructure development
+
+SmartCity is an evolving Infrastructure-as-Code project. The current repository provides a strong foundation for an AWS-hosted smart-city/IoT platform, but environment configuration and production hardening should be completed before treating it as a production deployment.
+
+---
+
+Ken Kaserebe
+
+GitHub: @kenkaserebe
+
+---
+
+github.com/kenkaserebe/SmartCity
