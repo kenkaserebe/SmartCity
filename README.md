@@ -21,8 +21,12 @@ flowchart TD
     B["VPC<br/><br/>Public / Private / DB<br/>Subnets<br/><br/>IGW + NAT + Flow logs"]
     C["Amazon EKS<br/><br/>API Gateway<br/>Sensor Worker<br/>Ingress<br/>Autoscaling"]
     D["Amazon RDS<br/>PostgreSQL<br/><br/>Application DB"]
+    E["S3<br/><br/>Sensor Data<br/>Logs<br/>Assets"]
+    F["SQS<br/><br/>Sensor<br/>Processing<br/>Queue"]
 
     A --> B
     B --> C
     B --> D
+    C --> E
+    C --> F
 ```
