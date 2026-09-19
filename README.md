@@ -244,3 +244,208 @@ global/backend/
 The backend bucket should be provisioned and verified before deploying dependent infrastructure.
 
 > **Important:** Terraform state can contain sensitive infrastructure information. Protect the state bucket and restrict access through IAM.
+
+## Deployment
+
+#### 1. Clone the repository
+
+```bash
+git clone https://github.com/kenkaserebe/smartcity
+cd smartcity
+```
+
+#### 2. Configure AWS
+
+Set your AWS credentials/profile:
+
+```bash
+aws configure
+```
+Then verify:
+
+```bash
+aws sts get-caller-identity
+```
+
+The root configuration currently defaults to the AWS ```default``` profile and ```eu-west-2```.
+
+#### Bootstrap Terraform state & Deploy Development Infrastructure
+
+This command will provision the remote state bucket, and then deploy the development infrastructure.
+
+```bash
+cd smartcity/environment/dev
+terragrunt run --all plan --backend-bootstrap
+terragrunt run --all apply
+```
+Terragrunt will ask you to confirm creation of the remote state S3 bucket and if you answer `y`, deployment will continue.
+
+
+#### Kubernetes Access
+
+After the EKS cluster has been created, retrieve its kubeconfig:
+
+```bash
+aws eks update-kubeconfig \
+    --region eu-west-2 \
+    --name smartcity-dev-eks-cluster
+```
+
+Verify connectivity:
+
+```bash
+kubectl get nodes
+```
+
+Then inspect the SmartCity workloads:
+
+```bash
+kubectl get pods -n smartcity
+
+kubectl get svc -n smartcity    # Services
+
+kubectl get ingress -n smartcity    # Ingress
+```
+
+---
+
+## Application Components
+
+The Kubernetes deployment currently consists of two primary workloads.
+
+##### API Gateway
+
+api-gateway
+
+The API exposes:
+
+/api
+/health
+
+and provides a Prometheus metrics endpoint.
+
+The deployment includes:
+
+- Readiness probes
+- Liveness probes
+- CPU/memory requests
+- CPU/memory limits
+- Horizontal Pod Autoscaling
+- Pod Disruption Budget
+
+##### Sensor Worker
+
+sensor-worker
+
+The worker is responsible for processing sensor data asynchronously.
+
+Its configuration includes:
+
+SQS queue
+S3 sensor-data bucket
+PostgreSQL
+Worker type
+
+The worker also exposes Prometheus-compatible metrics.
+
+
+---
+
+## Scaling
+
+The platform supports scaling at multiple layers.
+
+##### Infrastructure
+
+EKS managed node groups support configurable:
+
+min nodes
+desired nodes
+max nodes
+
+##### Kubernetes
+
+The API and worker deployments support Horizontal Pod Autoscaling.
+
+Example development configuration:
+
+API:
+    min: 1
+    max: 3
+
+Worker:
+    min: 1
+    max: 5
+
+This provides a foundation for scaling application workloads independently from the underlying EKS worker capacity.
+
+---
+
+## Security
+
+Security is implemented at multiple layers:
+
+##### Network
+
+- Private application/database subnets
+- Security groups
+- NAT-based outbound access
+- VPC Flow Logs
+- Database isolation
+
+##### AWS
+
+- IAM roles
+- KMS encryption for EKS secrets
+- Encrypted S3 state
+- S3 public-access blocking
+- Encrypted application storage
+
+##### Kubernetes
+
+- Namespaces
+- Kubernetes Secrets
+- Resource limits
+- Pod Disruption Budgets
+- Readiness/liveness probes
+- Optional TLS
+- Prometheus monitoring
+
+### ⚠️Development Security Notes
+
+**Do not deploy the repository's current development configuration directly to production**
+
+The development configuration currently contains placeholder/example credentials such as:
+
+ChangeMe123!
+dev-api-key-12345
+
+and these values are passed into infrastructure configuratation.
+
+Before production use:
+
+- Move database credentials to AWS Secrets Manager.
+- Move API keys to AWS Secrets Manager or another dedicated secret-management system.
+- Do not commit production credentials to Git.
+- Restrict EKS public API access to approved CIDRs or use private access.
+- Review IAM policies using least privilege.
+- Enable deletion protection where appropriate.
+- Review force_destroy settings.
+- Enable appropriate production backup retention.
+- Review TLS certificate management.
+- Review S3 bucket policies and lifecycle policies.
+- Review CloudWatch and Kubernetes logging retention.
+- Pin and regularly update provider/moduler/chart versions.
+- Run security scanning and Terraform policy checks in CI.
+
+The EKS module currently contains a hard-coded public API access CIDR, so this should be replaced with an environment-specific variable before production deployment.
+
+---
+
+### Production Readiness Checklist
+
+Before promoting an environment to production:
+
+#### AWS
+
+- [ ] Dedicated AWS account
