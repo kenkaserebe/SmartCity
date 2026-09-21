@@ -230,6 +230,58 @@ resource "aws_iam_openid_connect_provider" "cluster" {
 }
 
 # ===========================================================================================
+# EBS CSI DRIVER IAM ROLE
+# ===========================================================================================
+
+data "aws_iam_policy_document" "ebs_csi_assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.cluster[0].arn]
+    }
+
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    condition {
+      test      = "StringEquals"
+      variable  = "${replace(aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")}:aud"
+      values    = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test      = "StringEquals"
+      variable  = "${replace(aws_eks_cluster.main.identity[0].oidc[0].issuer, "https://", "")}:sub"
+      values    = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ebs_csi_driver" {
+  count               = var.create_oidc_provider ? 1 : 0
+
+  name                = "${var.project_name}-${var.environment}-ebs-csi-driver"
+
+  assume_role_policy  = data.aws_iam_policy_document.ebs_csi_assume_role.json
+
+  tags = merge(var.common_tags, {
+    Name        = "${var.project_name}-${var.environment}-ebs-csi-driver"
+    Environment = var.environment
+    Component   = "kubernetes"
+    Service     = "ebs-csi"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver" {
+  count       = var.create_oidc_provider ? 1 : 0
+
+  role        = aws_iam_role.ebs_csi_driver[0].name
+  policy_arn  = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+
+# ===========================================================================================
 # 6. CLUSTER ADD-ONS
 # ===========================================================================================
 
@@ -295,3 +347,24 @@ resource "aws_eks_addon" "lb_controller" {
   })
 }
 
+# AWS EBS CSI Driver
+resource "aws_eks_addon" "ebs_csi" {
+  count                       = var.create_oidc_provider ? 1 : 0
+
+  cluster_name                = aws_eks_cluster.main.name
+  addon_name                  = "aws-ebs-csi-driver"
+  service_account_role_arn    = aws_iam_role.ebs_csi_driver[0].arn
+
+  resolve_conflicts_on_create = "OVERWRITE"
+
+  tags = merge(var.common_tags, {
+    Name        = "${var.project_name}-${var.environment}-ebs-csi"
+    Environment = var.environment
+    Component   = "kubernetes"
+    Service     = "addon"
+  })
+
+  depends_on = [
+    aws_iam_role_policy_attachment.ebs_csi_driver
+  ]
+}

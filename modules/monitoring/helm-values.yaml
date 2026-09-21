@@ -10,12 +10,13 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
+          storageClassName: gp2
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
               storage: 50Gi
 
-alertManager:
+alertmanager:
   enabled: true
   alertmanagerSpec:
     storageSpec:
@@ -53,12 +54,13 @@ grafana:
       datasources:
         - name: Prometheus
           type: prometheus
-          url: http://prometheus-server.monitoring.svc.cluster.local
+          url: http://prometheus-operated.monitoring.svc.cluster.local:9090
           access: proxy
-          isDefault: true
+          isDefault: false
         - name: CloudWatch
           type: cloudwatch
           access: proxy
+          isDefault: false
           jsonData:
             authType: default
             defaultRegion: eu-west-2

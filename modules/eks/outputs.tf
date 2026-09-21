@@ -150,7 +150,7 @@ output "kubeconfig" {
                     "--cluster-name",
                     aws_eks_cluster.main.name,
                     "--region",
-                    data.aws_region.current.name
+                    data.aws_region.current.region
                 ]
                 interactiveMode = "Never"
             }

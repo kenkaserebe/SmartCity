@@ -11,18 +11,6 @@
 
 terraform {
   backend "s3" {}
-
-#   required_providers {
-#     kubernetes = {
-#         host                    = var.eks_cluster_endpoint
-#         cluster_ca_certificate  = base64decode(var.eks_cluster_ca)
-#         exec {
-#             api_version = "client.authentication.k8s.io/v1beta1"
-#             command     = "aws"
-#             args        = ["eks", "get-token", "--cluster-name", var.eks_cluster_name, "--region", var.region]
-#         }
-#     }
-#   }
 }
 
 
@@ -562,19 +550,23 @@ resource "kubernetes_manifest" "service_monitor_api" {
     manifest = {
         apiVersion  = "monitoring.coreos.com/v1"
         kind        = "ServiceMonitor"
+
         metadata    = {
             name        = "smartcity-api"
             namespace   = kubernetes_namespace.smartcity.metadata[0].name
+
             labels      = {
                 release = "prometheus"
             }
         }
+
         spec = {
             selector = {
-                match_labels = {
+                matchLabels = {
                     app = "api-gateway"
                 }
             }
+
             endpoints = [
                 {
                     port        = "metrics"
@@ -582,8 +574,9 @@ resource "kubernetes_manifest" "service_monitor_api" {
                     interval    = "30s"
                 }
             ]
-            namespace_selector = {
-                match_labels = [
+
+            namespaceSelector = {
+                matchNames = [
                     kubernetes_namespace.smartcity.metadata[0].name
                 ]
             }
@@ -597,9 +590,11 @@ resource "kubernetes_manifest" "service_monitor_worker" {
     manifest = {
         apiVersion  = "monitoring.coreos.com/v1"
         kind        = "ServiceMonitor"
+
         metadata = {
             name        = "smartcity-worker"
             namespace   = kubernetes_namespace.smartcity.metadata[0].name
+
             labels      = {
                 release = "prometheus"
             }
@@ -607,10 +602,11 @@ resource "kubernetes_manifest" "service_monitor_worker" {
         
         spec = {
             selector = {
-                match_labels = {
+                matchLabels = {
                     app = "sensor-worker"
                 }
             }
+
             endpoints = [
                 {
                     port        = "metrics"
@@ -618,8 +614,9 @@ resource "kubernetes_manifest" "service_monitor_worker" {
                     interval    = "30s"
                 }
             ]
-            namespace_selector = {
-                match_names = [
+
+            namespaceSelector = {
+                matchNames = [
                     kubernetes_namespace.smartcity.metadata[0].name
                 ]
             }

@@ -19,6 +19,10 @@ dependency "eks" {
     }
 }
 
+dependency "monitoring" {
+    config_path = "../monitoring"
+}
+
 dependency "rds" {
     config_path = "../rds"
 
