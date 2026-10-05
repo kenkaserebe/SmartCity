@@ -9,16 +9,20 @@ terraform {
     source = "../../../modules/s3"
 }
 
-remote_state {
-    backend = "s3"
-    config  = {
-        bucket          = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID", "000000000000")}"
-        key             = "smartcity/dev/s3/terraform.tfstate"
-        region          = "eu-west-2"
-        encrypt         = true
-        use_lockfile    = true
-    }
+dependency "sqs" {
+    config_path = "../sqs"
 }
+
+# remote_state {
+#     backend = "s3"
+#     config  = {
+#         bucket          = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID", "000000000000")}"
+#         key             = "smartcity/dev/s3/terraform.tfstate"
+#         region          = "eu-west-2"
+#         encrypt         = true
+#         use_lockfile    = true
+#     }
+# }
 
 inputs = {
     environment     = "dev"

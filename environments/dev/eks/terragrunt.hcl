@@ -10,35 +10,39 @@ terraform {
 }
 
 # Dependencies
-dependency "vpc" {
-    config_path = "../vpc"
+# dependency "vpc" {
+#     config_path = "../vpc"
 
-    mock_outputs = {
-        vpc_id = "vpc-00000000"
-        vpc_cidr = "10.0.0.0/16"
-        private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-        public_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-        database_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-    }
-}
+#     mock_outputs = {
+#         vpc_id = "vpc-00000000"
+#         vpc_cidr = "10.0.0.0/16"
+#         private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+#         public_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+#         database_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+#     }
+# }
 
-dependency "security_groups" {
-    config_path = "../security-groups"
+# dependency "security_groups" {
+#     config_path = "../security-groups"
 
-    mock_outputs = {
-        eks_cluster_sg_id = "sg-00000000"
-        eks_node_sg_id = "sg-00000000"
-    }
-}
+#     mock_outputs = {
+#         eks_cluster_sg_id = "sg-00000000"
+#         eks_node_sg_id = "sg-00000000"
+#     }
+# }
 
-dependency "iam" {
-    config_path = "../iam"
+# dependency "iam" {
+#     config_path = "../iam"
 
-    mock_outputs = {
-        eks_cluster_role_arn = "arn:aws:iam::000000000000:role/smartcity-dev-eks-cluster-role"
-        eks_node_role_arn = "arn:aws:iam::000000000000:role/smartcity-dev-eks-node-role"
-        oidc_provider_arn = null
-    }
+#     mock_outputs = {
+#         eks_cluster_role_arn = "arn:aws:iam::000000000000:role/smartcity-dev-eks-cluster-role"
+#         eks_node_role_arn = "arn:aws:iam::000000000000:role/smartcity-dev-eks-node-role"
+#         oidc_provider_arn = null
+#     }
+# }
+
+dependency "rds" {
+    config_path = "../rds"
 }
 
 inputs = {

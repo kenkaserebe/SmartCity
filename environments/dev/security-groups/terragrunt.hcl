@@ -13,14 +13,14 @@ terraform {
 dependency "vpc" {
     config_path = "../vpc"
 
-    # Mock outputs for plan/validate when VPC isn't applied yet
-    mock_outputs = {
-        vpc_id = "vpc-00000000"
-        vpc_cidr = "10.0.0.0/16"
-        private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-    }
+    # # Mock outputs for plan/validate when VPC isn't applied yet
+    # mock_outputs = {
+    #     vpc_id = "vpc-00000000"
+    #     vpc_cidr = "10.0.0.0/16"
+    #     private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+    # }
 
-    mock_outputs_allowed_terraform_commands = ["plan", "validate"]
+    # mock_outputs_allowed_terraform_commands = ["plan", "validate"]
 }
 
 inputs = {

@@ -10,42 +10,46 @@ terraform {
 }
 
 # Dependencies
+# dependency "eks" {
+#     config_path = "../eks"
+
+#     mock_outputs = {
+#         cluster_name = "smartcity-dev-eks-cluster"
+#         cluster_arn = "arn:aws:eks:eu-west-2:000000000000:cluster/smartcity-dev-eks-cluster"
+#     }
+# }
+
+# dependency "rds" {
+#     config_path = "../rds"
+
+#     mock_outputs = {
+#         db_instance_id = "smartcity-dev-postgres"
+#         db_endpoints = "smartcity-dev-postgres.xxxxxxxxxxxx.eu-west-2.rds.amazonaws.com"
+#     }
+# }
+
+# dependency "sqs" {
+#     config_path = "../sqs"
+
+#     mock_outputs = {
+#         main_queue_name = "smartcity-dev-queue"
+#         main_queue_url = "https://sqs.eu-west-2.amazonaws.com/000000000000/smartcity-dev-queue"
+#     }
+# }
+
+# remote_state {
+#     backend = "s3"
+#     config = {
+#         bucket = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID", "000000000000")}"
+#         key = "smartcity/dev/monitoring/terraform.tfstate"
+#         region = "eu-west-2"
+#         encrypt = true
+#         use_lockfile = true
+#     }
+# }
+
 dependency "eks" {
     config_path = "../eks"
-
-    mock_outputs = {
-        cluster_name = "smartcity-dev-eks-cluster"
-        cluster_arn = "arn:aws:eks:eu-west-2:000000000000:cluster/smartcity-dev-eks-cluster"
-    }
-}
-
-dependency "rds" {
-    config_path = "../rds"
-
-    mock_outputs = {
-        db_instance_id = "smartcity-dev-postgres"
-        db_endpoints = "smartcity-dev-postgres.xxxxxxxxxxxx.eu-west-2.rds.amazonaws.com"
-    }
-}
-
-dependency "sqs" {
-    config_path = "../sqs"
-
-    mock_outputs = {
-        main_queue_name = "smartcity-dev-queue"
-        main_queue_url = "https://sqs.eu-west-2.amazonaws.com/000000000000/smartcity-dev-queue"
-    }
-}
-
-remote_state {
-    backend = "s3"
-    config = {
-        bucket = "smart-city-tfstate-${get_env("AWS_ACCOUNT_ID", "000000000000")}"
-        key = "smartcity/dev/monitoring/terraform.tfstate"
-        region = "eu-west-2"
-        encrypt = true
-        use_lockfile = true
-    }
 }
 
 inputs = {

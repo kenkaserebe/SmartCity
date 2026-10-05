@@ -10,22 +10,26 @@ terraform {
 }
 
 # Dependencies
-dependency "vpc" {
-    config_path = "../vpc"
+# dependency "vpc" {
+#     config_path = "../vpc"
 
-    mock_outputs = {
-        vpc_id = "vpc-00000000"
-        database_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-        private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
-    }
-}
+#     mock_outputs = {
+#         vpc_id = "vpc-00000000"
+#         database_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+#         private_subnet_ids = ["subnet-00000000", "subnet-00000001", "subnet-00000002"]
+#     }
+# }
 
-dependency "security_groups" {
-    config_path = "../security-groups"
+# dependency "security_groups" {
+#     config_path = "../security-groups"
 
-    mock_outputs = {
-        database_sg_id = "sg-00000000"
-    }
+#     mock_outputs = {
+#         database_sg_id = "sg-00000000"
+#     }
+# }
+
+dependency "s3" {
+    config_path = "../s3"
 }
 
 inputs = {

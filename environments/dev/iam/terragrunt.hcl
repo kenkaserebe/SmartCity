@@ -9,17 +9,9 @@ terraform {
     source = "../../../modules/iam"
 }
 
-# dependency "s3" {
-#     config_path = "../s3"
-
-#     mock_outputs = {
-#         iam_policy_arn = "arn:aws:iam::000000000000:policy/mock-policy"
-#     }
-# }
-
-# dependency "iam" {
-#     config_path = 
-# }
+dependency "security-groups" {
+    config_path = "../security-groups"
+}
 
 inputs = {
     environment                 = "dev"
