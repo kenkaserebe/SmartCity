@@ -56,16 +56,9 @@ resource "kubernetes_namespace" "smartcity" {
     }
 }
 
-resource "kubernetes_namespace" "monitoring" {
-    count = var.deploy_monitoring ? 1 : 0
-
+data "kubernetes_namespace" "monitoring" {
     metadata {
-        name    = "monitoring"
-        labels  = {
-            name        = "monitoring"
-            environment = var.environment
-            managed     = "terraform"
-        }
+        name = "monitoring"
     }
 }
 
