@@ -59,7 +59,7 @@ inputs = {
     ]
 
     # Kubernetes Version
-    kubernetes_version = "1.36"
+    kubernetes_version = "1.37"
 
     # Endpoint Configuration
     endpoint_private_access = true
