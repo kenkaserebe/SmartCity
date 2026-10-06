@@ -9,47 +9,47 @@ terraform {
 }
 
 # Dependencies
-# dependency "eks" {
-#     config_path = "../eks"
+dependency "eks" {
+    config_path = "../eks"
 
-#     mock_outputs = {
-#         cluster_name                        = "smartcity-dev-eks-cluster"
-#         cluster_endpoint                    = "https://mock-cluster-endpoint.eks.amazonaws.com"
-#         cluster_certificate_authority_data  = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJQk5YV1hTdG5VY3d3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1qUXdNakF4TURCYUZ3MHpOVEF4TWpRd01qQXhNREJhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUN6VWlWckZ1akVWMmdmRkh0dFo1NlJmVkFDMmFMLzN4VnZqS1lzQVdIeDJZeEN6Z1hPWnF0VHBGM28KQ0JTKzlKcUZFRWg2Z1NHb0t1Z0JLOThrVlBBWmhMWnFmdXhXM1ZhbkZKRkVwam8xWktBQzR3d2p0ZWs1TGxsYQo5VjZtU1lOUng3a2h4b0RkUklwSWFucDZYUmZ3a0RBYldETGlnSlNGcTZVN1NBRUpqdzVoYndxbXA4QndFc1RDCitVTXZZYVdRZ0o2dTJNR2ZkSXdHbm9rbHg3VjlaV1dOU1p0R1pUODNoeXpjMldHZEU5Ujd3a3hFdXkzYmpSbUoKblhUZ0JzN3dSOFJReFlrRHRWOVhTemMvUlkvYlBIaGlQTktOS1oyV1hLODNoTDhZRHBUQSt0dkh3T3puVmJSNQpXTkFFK1N0QXl0b09CekhsU1N5QWdNQkFBR2pJekFoTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBCjhGOENVUUV3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUkwYkdFa3FXU1ZoSFpCcGxEdjNXVUtkaUxNZ05jNysKQ00yZS9JbmI1WWF1WTRPTUdnVFE4WWV5bHhGNk1zeFduRTFwbE1vckF1NENLeGd4N3JYenNuSDhCb0pIVldlNQpuUzIzWldUdjQzUkMvSnU3aHphK0UzcmNCR2twalVVV0U0RkMzc3E0YThzTG1GTTlFZ3FFcmE4WkdmcGJwY3pHCmoyOCtTb3RNM2VWeURPQ3d1YXNtZGR4YkM4YnlYYUppbU5FdGwwdlFRNTE2RXJsSXh5czIzaXk1NW9hMTNVUWcKUU9FczRFUzhzYml4NHNpYjdHRUliMUNiWHcwSUNEcHZmR05mR2pBN3BWczhZcWdSUzBGVVJkMVZJRS9ubjQxQwpLd09Ccm5ZTUJkM2dJVVlPdnFjS3UxZ3FONlpxbGd3eHpFQzhBbUhNUkRkVS9rdWFON3c9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
-#     }
-# }
+    mock_outputs = {
+        cluster_name                        = "smartcity-dev-eks-cluster"
+        cluster_endpoint                    = "https://mock-cluster-endpoint.eks.amazonaws.com"
+        cluster_certificate_authority_data  = "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJQk5YV1hTdG5VY3d3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1qUXdNakF4TURCYUZ3MHpOVEF4TWpRd01qQXhNREJhTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUUN6VWlWckZ1akVWMmdmRkh0dFo1NlJmVkFDMmFMLzN4VnZqS1lzQVdIeDJZeEN6Z1hPWnF0VHBGM28KQ0JTKzlKcUZFRWg2Z1NHb0t1Z0JLOThrVlBBWmhMWnFmdXhXM1ZhbkZKRkVwam8xWktBQzR3d2p0ZWs1TGxsYQo5VjZtU1lOUng3a2h4b0RkUklwSWFucDZYUmZ3a0RBYldETGlnSlNGcTZVN1NBRUpqdzVoYndxbXA4QndFc1RDCitVTXZZYVdRZ0o2dTJNR2ZkSXdHbm9rbHg3VjlaV1dOU1p0R1pUODNoeXpjMldHZEU5Ujd3a3hFdXkzYmpSbUoKblhUZ0JzN3dSOFJReFlrRHRWOVhTemMvUlkvYlBIaGlQTktOS1oyV1hLODNoTDhZRHBUQSt0dkh3T3puVmJSNQpXTkFFK1N0QXl0b09CekhsU1N5QWdNQkFBR2pJekFoTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBCjhGOENVUUV3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUkwYkdFa3FXU1ZoSFpCcGxEdjNXVUtkaUxNZ05jNysKQ00yZS9JbmI1WWF1WTRPTUdnVFE4WWV5bHhGNk1zeFduRTFwbE1vckF1NENLeGd4N3JYenNuSDhCb0pIVldlNQpuUzIzWldUdjQzUkMvSnU3aHphK0UzcmNCR2twalVVV0U0RkMzc3E0YThzTG1GTTlFZ3FFcmE4WkdmcGJwY3pHCmoyOCtTb3RNM2VWeURPQ3d1YXNtZGR4YkM4YnlYYUppbU5FdGwwdlFRNTE2RXJsSXh5czIzaXk1NW9hMTNVUWcKUU9FczRFUzhzYml4NHNpYjdHRUliMUNiWHcwSUNEcHZmR05mR2pBN3BWczhZcWdSUzBGVVJkMVZJRS9ubjQxQwpLd09Ccm5ZTUJkM2dJVVlPdnFjS3UxZ3FONlpxbGd3eHpFQzhBbUhNUkRkVS9rdWFON3c9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+    }
+}
 
-# dependency "monitoring" {
-#     config_path = "../monitoring"
-# }
+dependency "monitoring" {
+    config_path = "../monitoring"
+}
 
-# dependency "rds" {
-#     config_path = "../rds"
+dependency "rds" {
+    config_path = "../rds"
 
-#     mock_outputs = {
-#         db_instance_id  = "smartcity-dev-postgres"
-#         db_endpoint     = "smartcity-dev-postgres.xxxxxxxxxxxx.eu-west-2.rds.amazonaws.com"
-#         db_port         = "5432"
-#         db_name         = "smartcity"
-#         db_username     = "smartcity_admin"
-#     }
-# }
+    mock_outputs = {
+        db_instance_id  = "smartcity-dev-postgres"
+        db_endpoint     = "smartcity-dev-postgres.xxxxxxxxxxxx.eu-west-2.rds.amazonaws.com"
+        db_port         = "5432"
+        db_name         = "smartcity"
+        db_username     = "smartcity_admin"
+    }
+}
 
-# dependency "sqs" {
-#     config_path = "../sqs"
+dependency "sqs" {
+    config_path = "../sqs"
 
-#     mock_outputs = {
-#         main_queue_url = "https://sqs.eu-west-2.amazonaws.com/000000000000/smartcity-dev-queue"
-#     }
-# }
+    mock_outputs = {
+        main_queue_url = "https://sqs.eu-west-2.amazonaws.com/000000000000/smartcity-dev-queue"
+    }
+}
 
-# dependency "s3" {
-#     config_path = "../s3"
+dependency "s3" {
+    config_path = "../s3"
 
-#     mock_outputs = {
-#         sensor_data_bucket_id = "smartcity-dev-sensor-data"
-#     }
-# }
+    mock_outputs = {
+        sensor_data_bucket_id = "smartcity-dev-sensor-data"
+    }
+}
 
 dependency "monitoring" {
     config_path = "../monitoring"
@@ -76,8 +76,8 @@ remote_state {
 # =================================================================================================
 
 inputs = {
-    environment = "dev"
-    project_name = "smartcity"
+    environment     = "dev"
+    project_name    = "smartcity"
     region          = "eu-west-2"
 
     # ==========================================================================
